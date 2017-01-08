@@ -34,13 +34,58 @@ class Request implements iRequest {
 		$this->params = array();
 	}
 
+	/** Returns the base URL to our front controller */
+	public function getProtocol () {
+		return isset($_SERVER['HTTPS']) ? 'https' : 'http';
+	}
+
+	/** Returns the base URL to our front controller */
+	public function getPort () {
+		return isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 80;
+	}
+
+	/** Returns the server part of the URL to our front controller */
+	public function getHostname () {
+		return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+	}
+
+	/** Returns the full path of the URL */
+	public function getFullPath () {
+		return isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : (isset($_SERVER['REQUEST_URI']) ? substr($_SERVER['REQUEST_URI'], 0, strrchr($_SERVER['REQUEST_URI'], '?')): '/');
+	}
+
+	/** Returns the path of the URL to our front controller */
+	public function getBasePath () {
+		$full_path = $this->getFullPath();
+		$path = $this->getPath();
+		$base_path_length = strlen($full_path) - strlen($path);
+
+		if (substr($full_path, $base_path_length) === $path) {
+			return substr($full_path, 0, $base_path_length );
+		}
+
+		Log::write('full_path = ' . $full_path);
+		Log::write('path = ' . $path);
+		throw new Exception('Could not find base path!');
+	}
+
+	/** Returns the base URL to our front controller */
+	public function getBaseURL () {
+		return $this->getProtocol() . '://' . $this->getHostname() . $this->getBasePath();
+	}
+
+	/** Returns the full URL to current resource */
+	public function getURL () {
+		return rtrim($this->getBaseURL() . $this->getPath(), '/');
+	}
+
 	/** Returns the path for this resource */
-	public function getPath() {
+	public function getPath () {
 		return $this->path;
 	}
 
 	/** Returns params for this path */
-	public function getParams() {
+	public function getParams () {
 		return $this->params;
 	}
 

@@ -14,11 +14,18 @@ if(!defined('REST_PHP')) {
 /** */
 class JSONResponse extends Response {
 
-	/** Output data as JSON */
-	public function output($data) {
-		header('Content-Type: application/json');
-		echo json_encode($data) . "\n";
+	protected $data = NULL;
+
+	public function __construct ($data) {
+		$this->data = $data;
+	}
+
+	public function getHeaders () {
+		return array('Content-Type' => 'application/json');
+	}
+
+	public function getContent () {
+		return json_encode($this->data) . "\n";
 	}
 
 }
-

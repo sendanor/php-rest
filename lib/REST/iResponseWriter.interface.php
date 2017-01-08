@@ -13,9 +13,8 @@ if(!defined('REST_PHP')) {
 	die("Direct access not permitted\n");
 }
 
-interface iResponse {
-	public function getStatus ();
-	public function getHeaders ();
-	public function getContent ();
+interface iResponseWriter {
+	public function setDefaultResponse($type);
+	public function output ($data);
+	public function outputException (Exception $e);
 }
-

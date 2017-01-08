@@ -19,11 +19,21 @@ class API {
 	/** Default database connection */
 	static protected $db = null;
 
+	/** Default headers */
+	static protected $headers = array();
+
 	/** Array of supported methods */
 	static protected $methods = array('options', 'get', 'post', 'delete', 'put', 'patch');
 
 	/** If true, automatic documentation will be provided with OPTIONS method */
 	static private $auto_options_enabled = false;
+
+	/** Set a default headers */
+	static public function setDefaultHeaders (array $headers) {
+		foreach( $headers as $key => $value ) {
+			self::$headers[$key] = $value;
+		}
+	}
 
 	/** Set default database instance */
 	static public function setDatabase (iDatabase $db) {
@@ -57,7 +67,7 @@ class API {
 
 	/** Handle current request as a JSON REST request */
 	static public function run ($routes) {
-		$response = new JSONResponse();
+		$writer = new ResponseWriter();
 		try {
 			$request = new Request();
 
@@ -93,14 +103,10 @@ class API {
 
 			$data = $resource->$method($request);
 
-			//if(! (is_array($data) || is_object($data) )) {
-			//	throw new Exception("Didn't receive array: " . var_dump($data, true) );
-			//}
-
-			$response->output($data);
+			$writer->output($data);
 
 		} catch (Exception $e) {
-			$response->outputException($e);
+			$writer->outputException($e);
 		}
 	}
 

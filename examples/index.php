@@ -29,6 +29,11 @@ REST\setDatabase($db);
 // Enable automatic support for OPTIONS
 REST\enableAutoOptions();
 
+// Enable CORS
+REST\setDefaultHeaders(array(
+	'Access-Control-Allow-Origin' => '*'
+));
+
 // Run current request
 REST\run(array(
 	"/" => "RootElement",
