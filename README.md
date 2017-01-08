@@ -97,7 +97,7 @@ Require valid-user
 #### Setup a front controller
 
 Your REST backend will operate from a single front controller -- our example 
-uses [index.php](./examples/index.php).
+uses [index.php](examples/index.php).
 
 ##### Pass everything to the front controller
 
@@ -219,7 +219,7 @@ Returns the parsed JSON body from the request.
 
 ##### Other methods
 
-See [Request.class.php](./lib/REST/Request.class.php) for other public methods 
+See [Request.class.php](lib/REST/Request.class.php) for other public methods 
 available.
 
 ### Testing the API with *curl*
