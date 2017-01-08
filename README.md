@@ -28,7 +28,7 @@ methods.
 *Collection* is a resource which lets you interact with multiple resources. 
 These are normally other elements. It's like a database table.
 
-*Element* is a resource which lets you interact with single item. It's like a 
+*Element* is a resource which lets you interact with a single item. It's like a 
 row in a database table.
 
 ### Requirements
