@@ -22,7 +22,10 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
-		return $table->fetch($id);
+		if (!$table->existsById($id)) {
+			throw new HTTPError(404);
+		}
+		return $table->selectById($id);
 	}
 
 	/** Removes the element */
@@ -31,7 +34,11 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
-		return $table->delete($id);
+		if (!$table->existsById($id)) {
+			throw new HTTPError(404);
+		}
+		$table->deleteById($id);
+		return array('deleted' => 'success', 'id' => $id);
 	}
 
 	/** Changes the element */
@@ -40,8 +47,12 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
+		if (!$table->existsById($id)) {
+			throw new HTTPError(404);
+		}
 		$input = $request->getInput();
-		return $table->update($id, $input);
+		$table->updateById($id, $input);
+		return $table->selectById($id);
 	}
 
 }

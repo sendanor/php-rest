@@ -25,19 +25,17 @@ abstract class DatabaseResource extends Resource {
 	/** Set the database table name without prefixes */
 	protected function setTableName ($table) {
 		if (!is_string($table)) {
-			throw new Exception('$table must be string');
+			throw new Exception('Table name must be a string');
 		}
 		$db = $this->getDatabase();
-		$this->init();
 		$this->table = $db->getTable($table);
 		return $this;
 	}
 
 	/** Returns interface for $this->table */
 	protected function getTable () {
-		$this->init();
 		if(!$this->table) {
-			throw new Exception('$table must be defined');
+			throw new Exception('.setTableName() must be used first');
 		}
 		return $this->table;
 	}

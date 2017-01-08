@@ -31,7 +31,7 @@ abstract class DatabaseCollection extends DatabaseResource implements iCollectio
 			throw new HTTPError(400, "input-invalid");
 		}
 		$id = $table->insert($input);
-		return $table->fetch($id);
+		return $table->selectById($id);
 	}
 
 }

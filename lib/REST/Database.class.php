@@ -26,7 +26,7 @@ class Database implements iDatabase {
 	private $tables = NULL;
 
 	/** Construct a database interface */
-	public function __construct ($hostname, $username, $password, $database, $charset) {
+	public function __construct ($hostname=NULL, $username=NULL, $password=NULL, $database=NULL, $charset=NULL) {
 		if(func_num_args() >= 5) {
 			$this->connect($hostname, $username, $password, $database);
 			$this->charset($charset);

@@ -20,9 +20,16 @@ interface iDatabaseTable {
 	public function getPrefix ();
 	public function getTable ();
 	public function getPrimaryKey ();
+
 	public function insert (array $data);
+
 	public function select (array $where);
-	public function fetch ($id);
+	public function selectById ($id);
+
 	public function update (array $where, array $data);
+	public function updateById ($id, array $data);
+
 	public function delete (array $where);
+	public function deleteById ($id);
+
 }

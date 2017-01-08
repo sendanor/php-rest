@@ -23,7 +23,6 @@ interface iDatabase {
 	public function escape ($str);
 	public function lastError ();
 	public function lastInsertID ();
-	protected function initTables ();
 	public function setTable ($name, iDatabaseTable $table);
 	public function getTable ($name);
 

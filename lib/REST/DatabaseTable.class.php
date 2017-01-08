@@ -20,13 +20,20 @@ class DatabaseTable implements iDatabaseTable {
 	private $name = NULL;
 
 	protected $insert_format       = 'INSERT INTO `%s` (%s) VALUES (%s)';
+
+	protected $exists_byid_format  = 'SELECT COUNT(*) FROM `%s` WHERE `%s` = "%s" LIMIT 1';
+
 	protected $select_where_format = 'SELECT %s FROM `%s` WHERE %s';
 	protected $select_all_format   = 'SELECT %s FROM `%s`';
-	protected $fetch_format        = 'SELECT %s FROM `%s` WHERE `%s` = "%s" LIMIT 1';
+	protected $select_byid_format  = 'SELECT %s FROM `%s` WHERE `%s` = "%s" LIMIT 1';
+
 	protected $update_where_format = 'UPDATE `%s` SET %s WHERE %s';
 	protected $update_all_format   = 'UPDATE `%s` SET %s';
+	protected $update_byid_format  = 'UPDATE `%s` SET %s WHERE `%s` = "%s" LIMIT 1';
+
 	protected $delete_where_format = 'DELETE FROM `%s` WHERE %s';
 	protected $delete_all_format   = 'DELETE FROM `%s`';
+	protected $delete_byid_format  = 'DELETE FROM `%s` WHERE `%s` = "%s" LIMIT 1';
 
 	/** Construct an interface for database table */
 	public function __construct (iDatabase $db, $name) {
@@ -80,7 +87,7 @@ class DatabaseTable implements iDatabaseTable {
 		foreach ($keys as &$key) {
 			$key = '`'. $this->db->escapeColumn($key) . '`';
 		}
-		$query = sprintf($this->insert_format, $this->db->escapeTable($table), implode(', ', $keys), implode(', ', $values);
+		$query = sprintf($this->insert_format, $this->db->escapeTable($table), implode(', ', $keys), implode(', ', $values));
 		Log::write('query = ' . $query);
 		if(!$this->db->query($query)) {
 			throw new Exception('Insert failed: ' . $this->db->lastError());
@@ -103,21 +110,34 @@ class DatabaseTable implements iDatabaseTable {
 		}
 		Log::write(__FILE__ . ': query = ' . $query);
 		$rows = $this->db->query($query);
-		if (!$rows) {
+		if ($rows === FALSE) {
 			throw new Exception('Select failed: ' . $this->db->lastError());
 		}
 		return $rows;
 	}
 
+	/** Returns true if row with this primary key exists */
+	public function existsById ($id) {
+		$table = $this->getTable();
+		$primary_key = $this->getPrimaryKey();
+		$query = sprintf($this->exists_byid_format, $this->db->escapeTable($table), $this->db->escapeColumn($primary_key), $this->db->escape($id));
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			throw new Exception('[Row] exists by ID failed: ' . $this->db->lastError());
+		}
+		$values = array_values(array_shift($result));
+		return intval(array_shift($values)) === 1;
+	}
+
 	/** Fetch single row by primary key */
-	public function fetch ($id) {
+	public function selectById ($id) {
 		$table = $this->getTable();
 		$columns = '*';
 		$primary_key = $this->getPrimaryKey();
-		$query = sprintf($this->fetch_format, $columns, $this->escapeTable($table), $this->escapeColumn($primary_key), $this->escape($id));
-		$result = $this->query($query);
-		if (!$result) {
-			throw new Exception('Fetch failed: ' . $this->db->lastError());
+		$query = sprintf($this->select_byid_format, $columns, $this->db->escapeTable($table), $this->db->escapeColumn($primary_key), $this->db->escape($id));
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			throw new Exception('Select by ID failed: ' . $this->db->lastError());
 		}
 		return array_shift($result);
 	}
@@ -127,21 +147,38 @@ class DatabaseTable implements iDatabaseTable {
 		$table = $this->getTable();
 		$set = array();
 		foreach ($data as $key => $value) {
-			$set[] = '`' . $this->escapeColumn($key) . '` = \'' . $this->escape($value) . "'";
+			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
 		$values = array();
 		foreach ($where as $key => $value) {
-			$values[] = '`' . $this->escapeColumn($key) . '` = \'' . $this->escape($value) . "'";
+			$values[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
 		if (count($values) >= 1) {
-			$query = sprintf($this->update_where_format, $table, implode(', ', $set), implode(' AND ', $values));
+			$query = sprintf($this->update_where_format, $this->db->escapeTable($table), implode(', ', $set), implode(' AND ', $values));
 		} else {
-			$query = sprintf($this->update_all_format, $table, implode(', ', $set));
+			$query = sprintf($this->update_all_format, $this->db->escapeTable($table), implode(', ', $set));
 		}
 		Log::write(__FILE__ . ': query = ' . $query);
-		$result = $this->query($query);
-		if (!$result) {
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
 			throw new Exception('Update failed: ' . $this->db->lastError());
+		}
+		return $result;
+	}
+
+	/** Update rows by ID */
+	public function updateById ($id, array $data) {
+		$table = $this->getTable();
+		$primary_key = $this->getPrimaryKey();
+		$set = array();
+		foreach ($data as $key => $value) {
+			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
+		}
+		$query = sprintf($this->update_byid_format, $this->db->escapeTable($table), implode(', ', $set), $this->db->escapeColumn($primary_key), $this->db->escape($id) );
+		Log::write(__FILE__ . ': query = ' . $query);
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			throw new Exception('Update by ID failed: ' . $this->db->lastError());
 		}
 		return $result;
 	}
@@ -151,17 +188,30 @@ class DatabaseTable implements iDatabaseTable {
 		$table = $this->getTable();
 		$values = array();
 		foreach ($where as $key => $value) {
-			$values[] = '`' . $this->escapeColumn($key) . '` = \'' . $this->escape($value) . "'";
+			$values[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
 		if (count($values) >= 1) {
-			$query = sprintf($this->delete_where_format, $table, implode(' AND ', $values));
+			$query = sprintf($this->delete_where_format, $this->db->escapeTable($table), implode(' AND ', $values));
 		} else {
-			$query = sprintf($this->delete_all_format, $table);
+			$query = sprintf($this->delete_all_format, $this->db->escapeTable($table));
 		}
 		Log::write(__FILE__ . ': query = ' . $query);
-		$result = $this->query($query);
-		if (!$result) {
-			throw new Exception('Result failed: ' . $this->db->lastError());
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			throw new Exception('Delete failed: ' . $this->db->lastError());
+		}
+		return $result;
+	}
+
+	/** Delete row by primary key */
+	public function deleteById ($id) {
+		$table = $this->getTable();
+		$primary_key = $this->getPrimaryKey();
+		$query = sprintf($this->delete_byid_format, $this->db->escapeTable($table), $this->db->escapeColumn($primary_key), $this->db->escape($id) );
+		Log::write(__FILE__ . ': query = ' . $query);
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			throw new Exception('Delete by ID failed: ' . $this->db->lastError());
 		}
 		return $result;
 	}
