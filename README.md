@@ -2,16 +2,224 @@
 
 Simple object oriented PHP Framework to build JSON REST APIs.
 
+> It's ***2017***. Why PHP? Node.js is better!
+
+* **Less dependencies.** `php-rest` only requires PHP 5.3 features. No other external requirements.
+* **Long Term Support.** This software will work unchanged next year, and probably in the year 2027, too. We'll need something like a zombie apocalypse to make it obsolete.
+* **Easy deployment.** No need to setup process supervisors; your OS and *Apache* (or whatever HTTP server you use) already does that.
+* **Less disk space.** `php-rest` is about 836 kB. *Our Node.js API framework takes* ***freaking*** *182 MB.*
+
+### It's a framework, not a library.
+
+`php-rest` is intended to be **a framework**, *not* ***a library***.
+
+It's a tool you can use to easily build JSON based REST interfaces for your 
+client side or backend projects, focus on your business logic and not to worry 
+too much about the internal implementation details.
+
+We use it to build backend APIs for our Node.js backends -- especially for our 
+legacy projects.
+
+### About our terminology
+
+*Resource* is any REST path which you can make HTTP requests with different 
+methods.
+
+*Collection* is a resource which lets you interact with multiple resources. 
+These are normally other elements. It's like a database table.
+
+*Element* is a resource which lets you interact with a single item. It's like a 
+row in a database table.
+
 ### Requirements
 
 * PHP 5.3. or newer
-* For optional database operations: MySQL Server 5.0. or newer
+
+Optional features:
+
+* ***Web server software:*** *Apache*, *Nginx*, etc
+* ***Database Server:*** *MySQL* Server 5.0. or newer
 
 ### Install
 
 `npm install --save php-rest`
 
-### Example usage
+### Using `php-rest` with *Apache*
+
+#### Securing your API with HTTPS
+
+Using HTTPS in the year 2017 is recommended, free and there isn't many good 
+reasons not to use it. We recommend using [Let's Encrypt](https://letsencrypt.org/). 
+*Apache* has a good support for it, too.
+
+#### Securing the project folder with `.htaccess`
+
+You should start your project carefully securing your web folder with a 
+`.htaccess` file(s). We have [a sample file](examples/.htaccess) you can use as 
+a starting point.
+
+You can -- and probably *should* -- also use it to control who can make POST, 
+PUT and DELETE requests. ***`php-rest` doesn't have any ACL support built-in.***
+
+##### Basic HTTP Authentication
+
+Setup a password file at a path outside of webroot.
+
+```
+$ htpasswd -c /path/to/your/htusers foo
+$ chmod 604 /path/to/your/htusers
+```
+
+Configure `.htaccess` file:
+
+```
+AuthName "REST API"
+AuthType Basic
+AuthUserFile **/path/to/your/htusers**
+require valid-user
+```
+
+If you want to let people use GET, HEAD and OPTIONS; and only require 
+authenticated users for other methods, you can limit it like this:
+
+```
+<LimitExcept GET OPTIONS HEAD>
+Require valid-user
+</LimitExcept>
+```
+
+***Please note:*** You can also use *MySQL* instead of files with 
+[mod_authn_dbd](https://httpd.apache.org/docs/2.4/mod/mod_authn_dbd.html).
+
+#### Setup a front controller
+
+Your REST backend will operate from a single front controller -- our example 
+uses [index.php](examples/index.php).
+
+##### Pass everything to the front controller
+
+We'll use `.htaccess` to tell *Apache* to pass everything to our `index.php`:
+
+```
+AcceptPathInfo On
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+```
+
+##### Enable autoloader
+
+Our framework has an interface to use `__autoload()`, which you can 
+enable in your front controller:
+
+```
+function __autoload ($className) {
+	return REST\Autoloader::load($className);
+}
+```
+
+You should let it know where to find your business logic classes:
+
+```
+REST\addAutoloadPath(dirname(__FILE__) . '/src')
+```
+
+##### Enable database support
+
+If you want to use our built-in MySQL database support, you need to configure 
+it:
+
+```
+$db = new REST\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, 
+REST_DATABASE);
+$db->charset(REST_CHARSET);
+$db->setTablePrefix(REST_TABLE_PREFIX);
+REST\setDatabase($db);
+```
+
+###### Extending from `REST\DatabaseElement` and `REST\DatabaseCollection`
+
+These classes implement complete REST resources to use *MySQL* tables with 
+*GET*, *POST*, *PUT*, and *DELETE* operations.
+
+Minimal required setup is to call `parent::setTableName('contact');` from the 
+extending class to map it to specific *MySQL* table.
+
+Of course, you can extend or overwrite any method.
+
+***Be careful!*** These elements **do not have any ACL built-in**. If you expose 
+DatabaseElement -- or anything extended from it -- to the public, it will let 
+delete and modify any row in your *MySQL* table.
+
+##### Expose automatic API documentation with OPTIONS method
+
+`php-rest` can automatically use PHP's ReflectionClass to read documentation 
+from PHPdoc comments in your implementation and provide it to users as OPTIONS 
+method. To enable this feature use `REST\enableAutoOptions();`.
+
+##### Setup routes to resource implementations
+
+Finally you'll need to map your routes to your business logic classes.
+
+```
+REST\run(array(
+    "/" => "RootElement",
+    "/contact" => "ContactCollection",
+    "/contact/:contact_id" => "ContactElement"
+));
+```
+
+#### Writing REST resources
+
+You can extend from our abstract classes:
+
+* `REST\Element`, `REST\Collection`, or `REST\Resource` for non-database 
+resources
+* `REST\DatabaseElement`, `REST\DatabaseCollection`, or `REST\DatabaseResource` 
+for MySQL-based resources
+
+When you want to overwrite a built-in method, you simply write a function with 
+the name of the method:
+
+```
+/** The root resource for this REST service */
+class RootElement extends REST\Element {
+        /** Doesn't return anything useful yet. Simply a hello world. */
+        function get (iRequest $request) {
+                return array(
+                        'hello' => 'world'
+                );
+        }
+}
+```
+
+***Note:*** You can also call `parent::get($request)` to use the parent 
+implementation.
+
+##### `$request->getPath()`
+
+Returns the path of the request, like `/Contact/1`.
+
+##### `$request->getParams()`
+
+Returns the route parameters, like `1` for `$params['contact_id']` if route had 
+path like `/Contact/:contact_id`.
+
+##### `$request->getQuery()`
+
+Returns the request query params, like `/Contact?email=foo@example.com` ==> 
+`$query['email']` ==> `'foo@example.com'`.
+
+##### `$request->getInput()`
+
+Returns the parsed JSON body from the request.
+
+##### Other methods
+
+See [Request.class.php](lib/REST/Request.class.php) for other public methods 
+available.
+
+### Testing the API with *curl*
 
 Source code for the example API at [examples/](examples/).
 

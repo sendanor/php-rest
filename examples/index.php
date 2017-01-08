@@ -12,13 +12,13 @@ require( dirname(dirname(__FILE__)) . '/lib/REST/index.php');
 // Add our own path to REST autoloader
 REST\addAutoloadPath(dirname(__FILE__) . '/src');
 
-/* Enable autoloader */
+// Enable autoloader
 function __autoload ($className) {
 	return REST\Autoloader::load($className);
 }
 
 // Setup default MySQL database connection
-if(!defined('REST_TABLE_PREFIX')) {
+if (!defined('REST_TABLE_PREFIX')) {
     define('REST_TABLE_PREFIX', '');
 }
 $db = new REST\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
