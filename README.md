@@ -67,11 +67,8 @@ Setup a password file at a path outside of webroot.
 
 ```
 $ htpasswd -c /path/to/your/htusers foo
-$ chmod 600 /path/to/your/htusers
+$ chmod 604 /path/to/your/htusers
 ```
-
-Depending your web server configuration, you might need to use `chmod 604` 
-instead of `600`.
 
 Configure `.htaccess` file:
 
