@@ -42,6 +42,6 @@ function addAutoloadPath ($path) {
 }
 
 /** Set database */
-function setDatabase ($db) {
+function setDatabase (iDatabase $db) {
 	return API::setDatabase($db);
 }

@@ -10,7 +10,7 @@ class ContactElement extends REST\DatabaseElement {
 
 	/** */
 	public function __construct() {
-		parent::setTable('contact');
+		parent::setTableName('contact');
 	}
 
 }

@@ -18,18 +18,20 @@ abstract class DatabaseCollection extends DatabaseResource implements iCollectio
 	 * limit matches.
 	 */
 	public function get (iRequest $request) {
+		$table = $this->getTable();
 		$query = $request->getQuery();
-		return $this->select($query);
+		return $table->select($query);
 	}
 
 	/** Create a new element in the collection */
 	public function post (iRequest $request) {
+		$table = $this->getTable();
 		$input = $request->getInput();
 		if (!is_array($input)) {
 			throw new HTTPError(400, "input-invalid");
 		}
-		$id = $this->insert($input);
-		return $this->fetch($id);
+		$id = $table->insert($input);
+		return $table->fetch($id);
 	}
 
 }

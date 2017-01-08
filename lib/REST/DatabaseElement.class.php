@@ -18,27 +18,30 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 
 	/** Returns the element */
 	public function get (iRequest $request) {
+		$table = $this->getTable();
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
-		return $this->fetch($id);
+		return $table->fetch($id);
 	}
 
 	/** Removes the element */
 	public function delete (iRequest $request) {
+		$table = $this->getTable();
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
-		return $this->remove($id);
+		return $table->delete($id);
 	}
 
 	/** Changes the element */
 	public function post (iRequest $request) {
+		$table = $this->getTable();
 		$params = $request->getParams();
 		$values = array_values($params);
 		$id = array_pop($values);
 		$input = $request->getInput();
-		return $this->update($id, $input);
+		return $table->update($id, $input);
 	}
 
 }

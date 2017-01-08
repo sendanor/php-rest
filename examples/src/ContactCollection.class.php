@@ -7,8 +7,10 @@ if (!defined('RESTExample')) {
 
 /** Contact collection */
 class ContactCollection extends REST\DatabaseCollection {
+
 	/** */
 	public function __construct() {
-		parent::setTable('contact');
+		parent::setTableName('contact');
 	}
+
 }

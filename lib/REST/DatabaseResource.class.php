@@ -7,69 +7,39 @@
 namespace REST;
 
 /* Security check */
-if(!defined('REST_PHP')) {
+if (!defined('REST_PHP')) {
 	die("Direct access not permitted\n");
 }
 
 /** Base class for database driven REST resources */
 abstract class DatabaseResource extends Resource {
 
-	protected $db = NULL;
+	/** The database table interface */
 	protected $table = NULL;
 
-	/** Initialize assets */
-	function init() {
-		if(is_null($this->db)) {
-			$this->db = API::getDatabase();
-		}
+	/** Returns the database interface */
+	protected function getDatabase () {
+		return API::getDatabase();
 	}
 
-	/** */
-	protected function setTable($table) {
-		$this->table = $table;
+	/** Set the database table name without prefixes */
+	protected function setTableName ($table) {
+		if (!is_string($table)) {
+			throw new Exception('$table must be string');
+		}
+		$db = $this->getDatabase();
+		$this->init();
+		$this->table = $db->getTable($table);
 		return $this;
 	}
 
-	/** SQL query */
-	protected function query($query) {
+	/** Returns interface for $this->table */
+	protected function getTable () {
 		$this->init();
-		return $this->db->query($query);
-	}
-
-	/** Escape for SQL query */
-	protected function escape($query) {
-		$this->init();
-		return $this->db->escape($query);
-	}
-
-	/** Get a single row from database */
-	protected function fetch($id) {
-		$this->init();
-		return $this->db->fetch($this->table, $id);
-	}
-
-	/** Get matching rows from database */
-	protected function select(array $where) {
-		$this->init();
-		return $this->db->select($this->table, $where);
-	}
-
-	/** Delete database rows */
-	protected function remove (array $where) {
-		$this->init();
-		return $this->db->delete($this->table, $where);
-	}
-
-	/** Update database row */
-	protected function update (array $where) {
-		$this->init();
-		return $this->db->update($this->table, $where);
-	}
-
-	/** Insert data into table */
-	protected function insert (array $data) {
-		$this->init();
-		return $this->db->insert($this->table, $data);
+		if(!$this->table) {
+			throw new Exception('$table must be defined');
+		}
+		return $this->table;
 	}
 
 }

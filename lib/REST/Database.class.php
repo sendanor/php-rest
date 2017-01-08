@@ -16,22 +16,48 @@ if(!defined('REST_PHP')) {
 /** Hello test collection */
 class Database implements iDatabase {
 
+	/** MySQL connection object */
 	private $link = NULL;
+
+	/** The prefix of table names */
 	private $table_prefix = '';
 
+	/** An array of table objects for this database */
+	private $tables = NULL;
+
+	/** Construct a database interface */
+	public function __construct ($hostname, $username, $password, $database, $charset) {
+		if(func_num_args() >= 5) {
+			$this->connect($hostname, $username, $password, $database);
+			$this->charset($charset);
+			return;
+		}
+		if(func_num_args() !== 0) {
+			$this->connect($hostname, $username, $password, $database);
+		}
+	}
+
+	/** Close MySQL connection */
+	public function __destruct () {
+		if (!is_null($this->link)) {
+			mysqli_close($this->link);
+			$this->link = NULL;
+		}
+	}
+
 	/** */
-	public function setTablePrefix($table) {
+	public function setTablePrefix ($table) {
 		$this->table_prefix = $table;
 		return $this;
 	}
 
 	/** */
-	public function getTablePrefix() {
+	public function getTablePrefix () {
 		return $this->table_prefix;
 	}
 
 	/** Open MySQL connection */
-	public function connect($hostname, $username, $password, $database) {
+	public function connect ($hostname, $username, $password, $database) {
 		if($this->link) {
 			throw new Exception("Already connected to MySQL");
 		}
@@ -40,31 +66,20 @@ class Database implements iDatabase {
 	}
 
 	/** Set charset */
-	public function charset($charset) {
+	public function charset ($charset) {
 		mysqli_set_charset($this->link, $charset);
 		return $this;
 	}
 
-	/** Close MySQL connection */
-	public function __destruct() {
-		if (!is_null($this->link)) {
-			mysqli_close($this->link);
-			$this->link = NULL;
-		}
-	}
-
 	/** MySQL query */
-	public function query($query) {
+	public function query ($query) {
 		$result = mysqli_query($this->link, $query);
-
 		if (!$result) {
 			return FALSE;
 		}
-
 		if($result === TRUE) {
 			return TRUE;
 		}
-
 		$output = array();
 		for ($i=0; $i<mysqli_num_rows($result); $i++) {
 			$output[] = mysqli_fetch_assoc($result);
@@ -73,133 +88,62 @@ class Database implements iDatabase {
 	}
 
 	/** */
-	public function escapeIdentifier($str) {
+	public function escapeIdentifier ($str) {
 		return str_replace('`', '``', $str);
 	}
 
 	/** */
-	public function escapeTable($str) {
+	public function escapeTable ($str) {
 		return $this->escapeIdentifier($str);
 	}
 
 	/** */
-	public function escapeColumn($str) {
+	public function escapeColumn ($str) {
 		return $this->escapeIdentifier($str);
 	}
 
 	/** */
-	public function escape($str) {
+	public function escape ($str) {
 		return mysqli_real_escape_string($this->link, $str);
 	}
 
 	/** */
-	public function error() {
+	public function lastError () {
 		return mysqli_error($this->link);
 	}
 
 	/** */
-	public function insertID() {
+	public function lastInsertID () {
 		return mysqli_insert_id($this->link);
 	}
 
-	/** Insert query */
-	public function insert($table, $data) {
-		if(!is_string($table)) {
-			throw new Exception('Table not a string');
+	/** Set a table interface */
+	protected function initTables() {
+		if (is_null($this->tables)) {
+			$this->tables = array();
 		}
-
-		if(!is_array($data)) {
-			throw new Exception('Data not an array');
-		}
-
-		$keys = array_keys($data);
-		$values = array_values($data);
-
-		foreach ($values as &$value) {
-			$value = "'". $this->escape($value) . "'";
-		}
-
-		foreach ($keys as &$key) {
-			$key = '`'. $this->escapeColumn($key) . '`';
-		}
-
-		$table = $this->table_prefix . $table;
-		$query = 'INSERT INTO `'.$this->escapeTable($table).'` ('.implode(',', $keys).') VALUES ('.implode(',', $values).')';
-		Log::write('query = ' . $query);
-		if(!$this->query($query)) {
-			throw new Exception('Insert failed: ' . $this->error());
-		}
-		return $this->insertID();
 	}
 
-	/** Select rows */
-	public function select ($table, array $where) {
-
-		if(!is_string($table)) {
-			throw new Exception('Table not a string');
+	/** Set a table interface */
+	public function setTable($name, iDatabaseTable $table) {
+		if (!is_string($name)) {
+			throw new Exception('name must be string');
 		}
-
-		$values = array();
-		foreach ($where as $key => $value) {
-			$values[] = '`' . $this->escapeColumn($key) . '` = \'' . $this->escape($value) . "'";
-		}
-
-		$table = $this->table_prefix . $table;
-		$query = 'SELECT * FROM `'.$this->escapeTable($table).'`';
-		if(count($values) >= 1) {
-			$query .= ' WHERE ' . implode(' AND ', $values);
-		}
-		Log::write(__FILE__ . ': query = ' . $query);
-		return $this->query($query);
+		$this->initTables();
+		$this->tables[$name] = $table;
+		return $this;
 	}
 
-	/** Fetch a row */
-	public function fetch ($table, $id) {
-
-		if(!is_string($table)) {
-			throw new Exception('Table not a string');
+	/** Returns the table interface */
+	public function getTable($name) {
+		if (!is_string($name)) {
+			throw new Exception('name must be string');
 		}
-
-		$format = 'SELECT * FROM `%s` WHERE `%s` = "%s" LIMIT 1';
-		$primary_key = $table . '_id';
-		$table = $this->table_prefix . $table;
-		$query = sprintf($format, $this->escapeTable($table), $this->escapeColumn($primary_key), $this->escape($id));
-		$result = $this->query($query);
-
-		if(!$result) {
-			return NULL;
+		$this->initTables();
+		if (!isset($this->tables[$name])) {
+			$this->tables[$name] = new DatabaseTable($this, $name);
 		}
-
-		return array_shift($result);
-	}
-
-	/** Update rows */
-	public function update ($table, array $where, array $data) {
-
-		if(!is_string($table)) {
-			throw new Exception('table not a string');
-		}
-
-		if(!is_array($where)) {
-			throw new Exception('where not an array');
-		}
-
-		if(!is_array($data)) {
-			throw new Exception('data not an array');
-		}
-
-		$values = array();
-		foreach ($where as $key => $value) {
-			$values[] = '`' . $this->escape($key) . '` = \'' . $this->escape($value) . "'";
-		}
-
-		$table = $this->table_prefix . $table;
-		$query = 'UPDATE * FROM `'.$table.'`';
-		if(count($values) >= 1) {
-			$query .= ' WHERE ' . implode(' AND ', $values);
-		}
-		Log::write(__FILE__ . ': query = ' . $query);
-		return $this->query($query);
+		return $this->tables[$name];
 	}
 
 }
