@@ -69,6 +69,8 @@ class API {
 	static public function run ($routes) {
 		$writer = new ResponseWriter();
 		try {
+			$writer->setDefaultHeaders($this->headers);
+
 			$request = new Request();
 
 			if($routes instanceof iRouter) {
