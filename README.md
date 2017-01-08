@@ -7,6 +7,10 @@ Simple object oriented PHP Framework to build JSON REST APIs.
 * PHP 5.3. or newer
 * For optional database operations: MySQL Server 5.0. or newer
 
+### Install
+
+`npm install --save php-rest`
+
 ### Example usage
 
 Source code for the example API is located at ./examples/
