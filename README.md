@@ -13,7 +13,7 @@ Simple object oriented PHP Framework to build JSON REST APIs.
 
 ### Example usage
 
-Source code for the example API is located at ./examples/
+Source code for the example API at [examples/](examples/).
 
 ```
 $ curl -s -X OPTIONS https://www.example.com/api/|python -m json.tool
