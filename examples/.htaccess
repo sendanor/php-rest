@@ -5,9 +5,16 @@
 #AuthUserFile /path/to/your/htusers
 #require valid-user
 
-<Limit POST PUT DELETE>
+AddType application/json .json
+
+ErrorDocument 500 /php-rest/errors/500.json
+ErrorDocument 404 /php-rest/errors/404.json
+ErrorDocument 403 /php-rest/errors/403.json
+ErrorDocument 401 /php-rest/errors/401.json
+
+<LimitExcept GET OPTIONS HEAD>
 Require valid-user
-</Limit>
+</LimitExcept>
 
 AcceptPathInfo On
 Options -Indexes
