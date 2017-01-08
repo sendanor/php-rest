@@ -5,7 +5,7 @@ Simple object oriented PHP Framework to build JSON REST APIs.
 > It's ***2017***. Why PHP? Node.js is better!
 
 * **Less dependencies.** `php-rest` only requires PHP 5.3 features. No other external requirements.
-* **Long Term Support.** This software will work unchanged next year, and probably in year 2027, too.
+* **Long Term Support.** This software will work unchanged next year, and probably in the year 2027, too. We'll need something like a zombie apocalypse to make it obsolete.
 * **Easy deployment.** No need to setup process supervisors; your OS and Apache (or whatever HTTP server you use) already does that.
 * **Less disk space.** `php-rest` is about 836 kB. *Our Node.js API framework takes* ***freaking*** *182 MB.*
 
