@@ -69,7 +69,7 @@ class API {
 	static public function run ($routes) {
 		$writer = new ResponseWriter();
 		try {
-			$writer->setDefaultHeaders($this->headers);
+			$writer->setDefaultHeaders(self::$headers);
 
 			$request = new Request();
 
