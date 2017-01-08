@@ -59,7 +59,7 @@ You should start your project carefully securing your web folder with a
 a starting point.
 
 You can -- and probably *should* -- also use it to control who can make POST, 
-PUT and DELETE requests. `php-rest` doesn't have any ACL support built-in.
+PUT and DELETE requests. ***`php-rest` doesn't have any ACL support built-in.***
 
 ##### Basic HTTP Authentication
 
