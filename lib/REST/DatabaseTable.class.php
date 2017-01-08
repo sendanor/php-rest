@@ -13,118 +13,68 @@ if(!defined('REST_PHP')) {
 	die("Direct access not permitted\n");
 }
 
-/** Hello test collection */
-class Database implements iDatabase {
+/** Interface for database tables */
+class DatabaseTable implements iDatabaseTable {
 
 	private $link = NULL;
-	private $table_prefix = '';
+	private $prefix = '';
+	private $name = '';
 
 	/** */
-	public function setTablePrefix($table) {
-		$this->table_prefix = $table;
+	public function __construct($table) {
+		$this->name = $table;
+	}
+
+	/** */
+	public function setName($table) {
+		$this->name = $table;
 		return $this;
 	}
 
 	/** */
-	public function getTablePrefix() {
-		return $this->table_prefix;
+	public function getName() {
+		return $this->name;
 	}
 
-	/** Open MySQL connection */
-	public function connect($hostname, $username, $password, $database) {
-		if($this->link) {
-			throw new Exception("Already connected to MySQL");
-		}
-		$this->link = mysqli_connect($hostname, $username, $password, $database);
+	/** */
+	public function setPrefix($table) {
+		$this->prefix = $table;
 		return $this;
 	}
 
-	/** Set charset */
-	public function charset($charset) {
-		mysqli_set_charset($this->link, $charset);
+	/** */
+	public function getPrefix() {
+		return $this->prefix;
+	}
+
+	/** Set database interface */
+	public function setLink($link) {
+		$this->link = $link;
 		return $this;
-	}
-
-	/** Close MySQL connection */
-	public function __destruct() {
-		if (!is_null($this->link)) {
-			mysqli_close($this->link);
-			$this->link = NULL;
-		}
-	}
-
-	/** MySQL query */
-	public function query($query) {
-		$result = mysqli_query($this->link, $query);
-
-		if (!$result) {
-			return FALSE;
-		}
-
-		if($result === TRUE) {
-			return TRUE;
-		}
-
-		$output = array();
-		for ($i=0; $i<mysqli_num_rows($result); $i++) {
-			$output[] = mysqli_fetch_assoc($result);
-		}
-		return $output;
-	}
-
-	/** */
-	public function escapeIdentifier($str) {
-		return str_replace('`', '``', $str);
-	}
-
-	/** */
-	public function escapeTable($str) {
-		return $this->escapeIdentifier($str);
-	}
-
-	/** */
-	public function escapeColumn($str) {
-		return $this->escapeIdentifier($str);
-	}
-
-	/** */
-	public function escape($str) {
-		return mysqli_real_escape_string($this->link, $str);
-	}
-
-	/** */
-	public function error() {
-		return mysqli_error($this->link);
-	}
-
-	/** */
-	public function insertID() {
-		return mysqli_insert_id($this->link);
 	}
 
 	/** Insert query */
-	public function insert($table, $data) {
-		if(!is_string($table)) {
-			throw new Exception('Table not a string');
-		}
+	public function insert(array $data) {
 
-		if(!is_array($data)) {
-			throw new Exception('Data not an array');
+		$table = $this->name;
+
+		if(!is_string($table)) {
+			throw new Exception('Table name not set');
 		}
 
 		$keys = array_keys($data);
 		$values = array_values($data);
 
 		foreach ($values as &$value) {
-			$value = "'". $this->escape($value) . "'";
+			$value = "'". $this->link->escape($value) . "'";
 		}
 
 		foreach ($keys as &$key) {
-			$key = '`'. $this->escapeColumn($key) . '`';
+			$key = '`'. $this->link->escapeColumn($key) . '`';
 		}
 
 		$table = $this->table_prefix . $table;
-		$query = 'INSERT INTO `'.$this->escapeTable($table).'` ('.implode(',', $keys).') VALUES ('.implode(',', $values).')';
+		$query = 'INSERT INTO `'.$this->link->escapeTable($table).'` ('.implode(',', $keys).') VALUES ('.implode(',', $values).')';
 		Log::write('query = ' . $query);
 		if(!$this->query($query)) {
 			throw new Exception('Insert failed: ' . $this->error());

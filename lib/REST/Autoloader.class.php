@@ -31,14 +31,14 @@ class Autoloader {
 	 * otherwise false.
 	 */
 	static public function load ($className) {
-		Log::write("Autoloader::load($className)");
+		//Log::write("Autoloader::load($className)");
 		$className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
 		self::init();
 		foreach(self::$dirs as $dir) {
 			foreach(array('class', 'interface') as $type) {
 				$file = $dir. '/' . $className . '.' . $type . '.php';
 				if (file_exists($file)) {
-					Log::write("Loading " . $file);
+					//Log::write("Loading " . $file);
 					require_once $file;
 					return true;
 				}

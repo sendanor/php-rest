@@ -4,8 +4,8 @@ Sendanor's PHP REST Framework
 ### Requirements
 
 * PHP 5.3. or newer
+* For optional database operations: MySQL Server 5.0. or newer
 
 ### Example usage
 
-The source code available at ./examples/
-
+Working example API in ./examples/

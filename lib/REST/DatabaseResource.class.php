@@ -11,13 +11,13 @@ if(!defined('REST_PHP')) {
 	die("Direct access not permitted\n");
 }
 
-/** */
+/** Base class for database driven REST resources */
 abstract class DatabaseResource extends Resource {
 
 	protected $db = NULL;
 	protected $table = NULL;
 
-	/** Initialize */
+	/** Initialize assets */
 	function init() {
 		if(is_null($this->db)) {
 			$this->db = API::getDatabase();
@@ -54,8 +54,20 @@ abstract class DatabaseResource extends Resource {
 		return $this->db->select($this->table, $where);
 	}
 
+	/** Delete database rows */
+	protected function remove (array $where) {
+		$this->init();
+		return $this->db->delete($this->table, $where);
+	}
+
+	/** Update database row */
+	protected function update (array $where) {
+		$this->init();
+		return $this->db->update($this->table, $where);
+	}
+
 	/** Insert data into table */
-	protected function insert(array $data) {
+	protected function insert (array $data) {
 		$this->init();
 		return $this->db->insert($this->table, $data);
 	}

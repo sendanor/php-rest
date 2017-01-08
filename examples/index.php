@@ -10,7 +10,7 @@ require('config.php');
 require( dirname(dirname(__FILE__)) . '/lib/REST/index.php');
 
 // Add our own path to REST autoloader
-REST\addAutoloadPath(dirname(__FILE__));
+REST\addAutoloadPath(dirname(__FILE__) . '/src');
 
 /* Enable autoloader */
 function __autoload ($className) {
@@ -33,17 +33,6 @@ REST\enableAutoOptions();
 // Run current request
 REST\run(array(
 	"/" => "RootElement",
-	"/:email" => "UserRootElement",
-	"/:email/client" => "ClientCollection",
-	"/:email/client/:client_id" => "ClientElement",
-	"/:email/client/:client_id/invoice" => "InvoiceCollection",
-	"/:email/client/:client_id/invoice/:invoice_id" => "InvoiceElement",
-	"/:email/client/:client_id/invoice/:invoice_id/row" => "InvoiceRowCollection",
-	"/:email/client/:client_id/invoice/:invoice_id/row/:id" => "InvoiceRowElement",
-	"/:email/client/:client_id/payment" => "PaymentCollection",
-	"/:email/client/:client_id/payment/:id" => "PaymentElement",
-	"/:email/client/:client_id/document" => "DocumentCollection",
-	"/:email/client/:client_id/document/:id" => "DocumentElement",
-	"/:email/client/:client_id/contact" => "ContactCollection",
-	"/:email/client/:client_id/contact/:id" => "ContactElement"
+	"/contact" => "ContactCollection",
+	"/contact/:contact_id" => "ContactElement"
 ));

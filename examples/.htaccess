@@ -1,0 +1,14 @@
+
+# Use basic auth to secure your API
+#AuthName "ERP"
+#AuthType Basic
+#AuthUserFile /path/to/your/htusers
+#require valid-user
+
+AcceptPathInfo On
+Options -Indexes
+IndexIgnore */*
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [QSA,L]
