@@ -15,7 +15,7 @@ Simple object oriented PHP Framework to build JSON REST APIs.
 
 It's a tool you can use to easily build JSON based REST interfaces for your 
 client side or backend projects, focus on your business logic and not to worry 
-about the internal implementation details.
+too much about the internal implementation details.
 
 We use it to build backend APIs for our Node.js backends -- especially for our 
 legacy projects.
