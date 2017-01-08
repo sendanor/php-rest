@@ -55,7 +55,7 @@ reasons not to use it. We recommend using [Let's Encrypt](https://letsencrypt.or
 #### Securing the project folder with `.htaccess`
 
 You should start your project carefully securing your web folder with a 
-`.htaccess` file(s). We have [examples/.htaccess](a sample file) you can use as 
+`.htaccess` file(s). We have [a sample file](examples/.htaccess) you can use as 
 a starting point.
 
 You can -- and probably *should* -- also use it to control who can make POST, 
