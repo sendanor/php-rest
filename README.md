@@ -7,7 +7,7 @@ Simple object oriented PHP Framework to build JSON REST APIs.
 * **Less dependencies.** `php-rest` only requires PHP 5.3 features. No other external requirements.
 * **Long Term Support.** This software will work unchanged next year, and probably in year 2027, too.
 * **Easy deployment.** No need to setup process supervisors; your OS and Apache (or whatever HTTP server you use) already does that.
-* **Less disk space.** `php-rest` is about 836 kB. *Our Node.js API framework takes ***freaking*** 182 MB.*
+* **Less disk space.** `php-rest` is about 836 kB. *Our Node.js API framework takes* ***freaking*** *182 MB.*
 
 ### Framework, not a library.
 
