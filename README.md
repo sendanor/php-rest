@@ -147,7 +147,7 @@ extending class to map it to specific *MySQL* table.
 
 Of course, you can extend or overwrite any method.
 
-***Be careful!*** These elements do not have any ACL built-in. If you expose 
+***Be careful!*** These elements **do not have any ACL built-in**. If you expose 
 DatabaseElement -- or anything extended from it -- to the public, it will let 
 delete and modify any row in your *MySQL* table.
 
