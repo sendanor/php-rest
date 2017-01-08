@@ -107,7 +107,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
 ```
 
-##### Autoloader
+##### Enable autoloader
 
 Our framework has an interface to use `__autoload()`, which you can 
 enable in your front controller:
