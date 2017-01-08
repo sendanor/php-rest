@@ -5,6 +5,10 @@
 #AuthUserFile /path/to/your/htusers
 #require valid-user
 
+<Limit POST PUT DELETE>
+Require valid-user
+</Limit>
+
 AcceptPathInfo On
 Options -Indexes
 IndexIgnore */*
