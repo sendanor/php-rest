@@ -1,6 +1,6 @@
 
 # Use basic auth to secure your API
-#AuthName "ERP"
+#AuthName "REST API"
 #AuthType Basic
 #AuthUserFile /path/to/your/htusers
 #require valid-user
