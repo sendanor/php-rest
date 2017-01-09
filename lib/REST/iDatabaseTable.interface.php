@@ -24,6 +24,7 @@ interface iDatabaseTable {
 	public function insert (array $data);
 
 	public function select (array $where);
+	public function selectAll ();
 	public function selectById ($id);
 
 	public function update (array $where, array $data);

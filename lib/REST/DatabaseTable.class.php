@@ -116,6 +116,11 @@ class DatabaseTable implements iDatabaseTable {
 		return $rows;
 	}
 
+	/** Select multiple rows */
+	public function selectAll () {
+		return $this->select(array());
+	}
+
 	/** Returns true if row with this primary key exists */
 	public function existsById ($id) {
 		$table = $this->getTable();
@@ -153,11 +158,13 @@ class DatabaseTable implements iDatabaseTable {
 		foreach ($where as $key => $value) {
 			$values[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
-		if (count($values) >= 1) {
-			$query = sprintf($this->update_where_format, $this->db->escapeTable($table), implode(', ', $set), implode(' AND ', $values));
-		} else {
+		if (count($set) < 1) {
+			throw new Exception("Empty data array -- nothing to update");
+		}
+		if (count($where) < 1) {
 			throw new Exception("If you really want to update the whole table, use .updateAll()");
 		}
+		$query = sprintf($this->update_where_format, $this->db->escapeTable($table), implode(', ', $set), implode(' AND ', $values));
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
 			Log::write(__FILE__ . ': query = ' . $query);
@@ -172,6 +179,9 @@ class DatabaseTable implements iDatabaseTable {
 		$set = array();
 		foreach ($data as $key => $value) {
 			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
+		}
+		if (count($set) < 1) {
+			throw new Exception("Empty data array -- nothing to update");
 		}
 		$query = sprintf($this->update_all_format, $this->db->escapeTable($table), implode(', ', $set));
 		$result = $this->db->query($query);
@@ -190,6 +200,9 @@ class DatabaseTable implements iDatabaseTable {
 		foreach ($data as $key => $value) {
 			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
+		if (count($set) < 1) {
+			throw new Exception("Empty data array -- nothing to update");
+		}
 		$query = sprintf($this->update_byid_format, $this->db->escapeTable($table), implode(', ', $set), $this->db->escapeColumn($primary_key), $this->db->escape($id) );
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
@@ -206,11 +219,10 @@ class DatabaseTable implements iDatabaseTable {
 		foreach ($where as $key => $value) {
 			$values[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
-		if (count($values) >= 1) {
-			$query = sprintf($this->delete_where_format, $this->db->escapeTable($table), implode(' AND ', $values));
-		} else {
+		if (count($values) < 1) {
 			throw new Exception("If you really want to delete the whole table, use .deleteAll()");
 		}
+		$query = sprintf($this->delete_where_format, $this->db->escapeTable($table), implode(' AND ', $values));
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
 			Log::write(__FILE__ . ': query = ' . $query);
