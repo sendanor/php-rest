@@ -27,9 +27,11 @@ interface iDatabaseTable {
 	public function selectById ($id);
 
 	public function update (array $where, array $data);
+	public function updateAll (array $data);
 	public function updateById ($id, array $data);
 
 	public function delete (array $where);
+	public function deleteAll ();
 	public function deleteById ($id);
 
 }

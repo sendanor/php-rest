@@ -88,8 +88,8 @@ class DatabaseTable implements iDatabaseTable {
 			$key = '`'. $this->db->escapeColumn($key) . '`';
 		}
 		$query = sprintf($this->insert_format, $this->db->escapeTable($table), implode(', ', $keys), implode(', ', $values));
-		Log::write('query = ' . $query);
 		if(!$this->db->query($query)) {
+			Log::write('query = ' . $query);
 			throw new Exception('Insert failed: ' . $this->db->lastError());
 		}
 		return $this->db->lastInsertID();
@@ -108,9 +108,9 @@ class DatabaseTable implements iDatabaseTable {
 		} else {
 			$query = sprintf($this->select_all_format, $columns, $this->db->escapeTable($table));
 		}
-		Log::write(__FILE__ . ': query = ' . $query);
 		$rows = $this->db->query($query);
 		if ($rows === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
 			throw new Exception('Select failed: ' . $this->db->lastError());
 		}
 		return $rows;
@@ -156,11 +156,27 @@ class DatabaseTable implements iDatabaseTable {
 		if (count($values) >= 1) {
 			$query = sprintf($this->update_where_format, $this->db->escapeTable($table), implode(', ', $set), implode(' AND ', $values));
 		} else {
-			$query = sprintf($this->update_all_format, $this->db->escapeTable($table), implode(', ', $set));
+			throw new Exception("If you really want to update the whole table, use .updateAll()");
 		}
-		Log::write(__FILE__ . ': query = ' . $query);
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
+			throw new Exception('Update failed: ' . $this->db->lastError());
+		}
+		return $result;
+	}
+
+	/** Update rows */
+	public function updateAll (array $data) {
+		$table = $this->getTable();
+		$set = array();
+		foreach ($data as $key => $value) {
+			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
+		}
+		$query = sprintf($this->update_all_format, $this->db->escapeTable($table), implode(', ', $set));
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
 			throw new Exception('Update failed: ' . $this->db->lastError());
 		}
 		return $result;
@@ -175,15 +191,15 @@ class DatabaseTable implements iDatabaseTable {
 			$set[] = '`' . $this->db->escapeColumn($key) . '` = \'' . $this->db->escape($value) . "'";
 		}
 		$query = sprintf($this->update_byid_format, $this->db->escapeTable($table), implode(', ', $set), $this->db->escapeColumn($primary_key), $this->db->escape($id) );
-		Log::write(__FILE__ . ': query = ' . $query);
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
 			throw new Exception('Update by ID failed: ' . $this->db->lastError());
 		}
 		return $result;
 	}
 
-	/** Delete rows */
+	/* Delete rows */
 	public function delete (array $where) {
 		$table = $this->getTable();
 		$values = array();
@@ -193,11 +209,23 @@ class DatabaseTable implements iDatabaseTable {
 		if (count($values) >= 1) {
 			$query = sprintf($this->delete_where_format, $this->db->escapeTable($table), implode(' AND ', $values));
 		} else {
-			$query = sprintf($this->delete_all_format, $this->db->escapeTable($table));
+			throw new Exception("If you really want to delete the whole table, use .deleteAll()");
 		}
-		Log::write(__FILE__ . ': query = ' . $query);
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
+			throw new Exception('Delete failed: ' . $this->db->lastError());
+		}
+		return $result;
+	}
+
+	/* Delete rows */
+	public function deleteAll () {
+		$table = $this->getTable();
+		$query = sprintf($this->delete_all_format, $this->db->escapeTable($table));
+		$result = $this->db->query($query);
+		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
 			throw new Exception('Delete failed: ' . $this->db->lastError());
 		}
 		return $result;
@@ -208,9 +236,9 @@ class DatabaseTable implements iDatabaseTable {
 		$table = $this->getTable();
 		$primary_key = $this->getPrimaryKey();
 		$query = sprintf($this->delete_byid_format, $this->db->escapeTable($table), $this->db->escapeColumn($primary_key), $this->db->escape($id) );
-		Log::write(__FILE__ . ': query = ' . $query);
 		$result = $this->db->query($query);
 		if ($result === FALSE) {
+			Log::write(__FILE__ . ': query = ' . $query);
 			throw new Exception('Delete by ID failed: ' . $this->db->lastError());
 		}
 		return $result;
