@@ -38,5 +38,7 @@ REST\setDefaultHeaders(array(
 REST\run(array(
 	"/" => "RootElement",
 	"/contact" => "ContactCollection",
-	"/contact/:contact_id" => "ContactElement"
+	"/contact/:contact_id" => "ContactElement",
+	"/error" => "REST\ErrorCollection",
+	"/error/:error_id" => "REST\ErrorElement"
 ));

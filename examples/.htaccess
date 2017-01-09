@@ -9,13 +9,6 @@
 Require valid-user
 </LimitExcept>
 
-# Turn HTML error messages as JSON
-AddType application/json .json
-ErrorDocument 500 /php-rest/errors/500.json
-ErrorDocument 404 /php-rest/errors/404.json
-ErrorDocument 403 /php-rest/errors/403.json
-ErrorDocument 401 /php-rest/errors/401.json
-
 # Disable Apache auto indexes
 Options -Indexes
 IndexIgnore */*
@@ -26,3 +19,40 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 #RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+
+# Turn on HTTP error messages as JSON
+AddType application/json .json
+ErrorDocument 400 /php-rest/error/400
+ErrorDocument 401 /php-rest/error/401
+ErrorDocument 402 /php-rest/error/402
+ErrorDocument 403 /php-rest/error/403
+ErrorDocument 404 /php-rest/error/404
+ErrorDocument 405 /php-rest/error/405
+ErrorDocument 406 /php-rest/error/406
+ErrorDocument 407 /php-rest/error/407
+ErrorDocument 408 /php-rest/error/408
+ErrorDocument 409 /php-rest/error/409
+ErrorDocument 410 /php-rest/error/410
+ErrorDocument 411 /php-rest/error/411
+ErrorDocument 412 /php-rest/error/412
+ErrorDocument 413 /php-rest/error/413
+ErrorDocument 414 /php-rest/error/414
+ErrorDocument 415 /php-rest/error/415
+ErrorDocument 416 /php-rest/error/416
+ErrorDocument 417 /php-rest/error/417
+ErrorDocument 418 /php-rest/error/418
+ErrorDocument 422 /php-rest/error/422
+ErrorDocument 423 /php-rest/error/423
+ErrorDocument 424 /php-rest/error/424
+ErrorDocument 425 /php-rest/error/425
+ErrorDocument 426 /php-rest/error/426
+ErrorDocument 500 /php-rest/error/500
+ErrorDocument 501 /php-rest/error/501
+ErrorDocument 502 /php-rest/error/502
+ErrorDocument 503 /php-rest/error/503
+ErrorDocument 504 /php-rest/error/504
+ErrorDocument 505 /php-rest/error/505
+ErrorDocument 506 /php-rest/error/506
+ErrorDocument 507 /php-rest/error/507
+ErrorDocument 509 /php-rest/error/509
+ErrorDocument 510 /php-rest/error/510

@@ -121,4 +121,15 @@ class Request implements iRequest {
 		return $this;
 	}
 
+	/** Returns a URL to another resource, and $path may be relative */
+	public function getRelativeURL ($path) {
+		if (strlen($path) === 0) {
+			return $this->getURL();
+		}
+		if ($path[0] === '/') {
+			return $this->getBaseURL() . $path;
+		}
+		return $this->getURL() . '/' . $path;
+	}
+
 }

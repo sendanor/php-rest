@@ -85,4 +85,9 @@ class HTTPStatusMessages {
 		return "Undefined";
 	}
 
+	/** Returns all codes */
+	static public function getAll () {
+		return self::$codes;
+	}
+
 }

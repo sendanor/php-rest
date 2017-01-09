@@ -71,12 +71,5 @@ function redirect ($request, $path=NULL) {
 		return new Redirect($path);
 	}
 
-	//Log::write("getPath() = " . $request->getPath());
-	//Log::write("getBaseURL() = " . $request->getBaseURL());
-
-	if ($path[0] === '/') {
-		return new Redirect($request->getBaseURL() . $path );
-	}
-
-	return new Redirect($request->getURL() . '/' . $path);
+	return new Redirect($request->getRelativeURL($path));
 }
