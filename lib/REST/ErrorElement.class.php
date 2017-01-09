@@ -12,7 +12,7 @@ if (!defined('RESTExample')) {
 /** Special element to build JSON HTTP error messages for external web servers like Apache */
 class ErrorElement extends Element {
 
-	/** Doesn't return anything useful yet. Simply a hello world. */
+	/** Returns a JSON object with code and error properties */
 	function get (iRequest $request) {
 		$params = $request->getParams();
 		$values = array_values($params);

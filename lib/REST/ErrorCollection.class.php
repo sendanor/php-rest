@@ -12,7 +12,7 @@ if (!defined('RESTExample')) {
 /** Special Collection to build JSON HTTP error messages for external web servers like Apache */
 class ErrorCollection extends Collection {
 
-	/** Doesn't return anything useful yet. Simply a hello world. */
+	/** Returns a JSON object with all supported error messages as properties with links to invidual elements */
 	function get (iRequest $request) {
 		$body = array(
 			'$ref' => $request->getURL()
