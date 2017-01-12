@@ -43,6 +43,13 @@ class Autoloader {
 					return true;
 				}
 			}
+
+			$file = $dir. '/' . $className . '.php';
+			if (file_exists($file)) {
+				//Log::write("Loading " . $file);
+				require_once $file;
+				return true;
+			}
 		}
 		return false;
 	} 
