@@ -19,7 +19,7 @@ function fatal_error_handler($buffer){
 
 	if (!is_null($error)) {
 		Log::write("PHP Error: " . $error['message'] . ' at ' . $error['file'] . ':' . $error['line']);
-		Response::setStatus(500, "Backend Error");
+		ResponseWriter::setStatus(500, "Backend Error");
 		header('Content-Type: application/json');
 		return json_encode(array(
 			'error' => 'Backend Error',
