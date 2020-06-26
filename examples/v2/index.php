@@ -1,19 +1,24 @@
 <?php
 
-openlog("myScriptLog", LOG_PID | LOG_PERROR, LOG_LOCAL0);
-
 // Import our core library
 require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/index.php' );
 
 // Import our JSON file library
 require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/File/index.php' );
 
-$DATA   = new REST2\File\JSON( dirname(__FILE__) . "/data.json" );
+use REST2\Logger\Syslog as Logger;
+$logger = new Logger("myScriptLog");
 
-$METHOD = REST2\Request::getMethod();
-$PATH   = REST2\Request::getPath();
+use REST2\File\JSON as File;
+$DATA   = new File( dirname(__FILE__) . "/data.json" );
 
-syslog(LOG_INFO, "Request '$METHOD' '$PATH'");
+use REST2\Request as Request;
+use REST2\Response as Response;
+
+$METHOD = Request::getMethod();
+$PATH   = Request::getPath();
+
+$logger->info("Request '$METHOD' '$PATH'");
 
 switch ( $PATH ) {
 
@@ -24,17 +29,17 @@ case "/hello":
 
   # PUT /hello
   case "put":
-    $DATA->hello = REST2\Request::getInput();
+    $DATA->hello = Request::getInput();
 
   # GET|HEAD /hello
   case "head":
   case "get":
-    REST2\Response::outputJSON( $DATA->hello );
+    Response::outputJSON( $DATA->hello );
     break;
 
   # Other...
   default:
-    REST2\Response::outputError(405);
+    Response::outputError(405);
     break;
   }
   break;
@@ -47,17 +52,17 @@ case "/":
 
   # PUT /
   case "put":
-    $DATA->setInternal( REST2\Request::getInput() );
+    $DATA->setInternal( Request::getInput() );
 
   # GET /
   case "head":
   case "get":
-    REST2\Response::output( $DATA );
+    Response::output( $DATA );
     break;
 
   # Other methods
   default:
-    REST2\Response::outputError(405);
+    Response::outputError(405);
   }
   break;
 
@@ -65,6 +70,6 @@ case "/":
 # Any other path...
 default:
 
-  REST2\Response::outputError(404);
+  Response::outputError(404);
 
 }
