@@ -15,53 +15,56 @@ $PATH = REST2\Request::getPath();
 
 syslog(LOG_INFO, "Request '$METHOD' '$PATH'");
 
-switch ( $METHOD ) {
+switch ( $PATH ) {
 
-case "head":
-case "get":
+# hello path...
+case "/hello":
 
-  switch ( $PATH ) {
+  switch ( $METHOD ) {
 
-    case "/hello":
-      REST2\Response::outputJSON( $DATA->hello );
-      break;
+  # PUT /hello
+  case "put":
+    $DATA->hello = REST2\Request::getInput();
 
-    case "/":
-      REST2\Response::output( $DATA );
-      break;
+  # GET|HEAD /
+  case "head":
+  case "get":
+    REST2\Response::outputJSON( $DATA->hello );
+    break;
 
-    default:
-      REST2\Response::outputError(404);
-      break;
-
+  # Other...
+  default:
+    REST2\Response::outputError(405);
+    break;
   }
-
   break;
 
-case "put":
-      
-  switch ( $PATH ) {
 
-    case "/hello":
-      $DATA->hello = REST2\Request::getInput();
-      REST2\Response::outputJSON( $DATA->hello );
-      break;
+# Root path...
+case "/":
 
-    case "/":
-      $DATA->setInternal( REST2\Request::getInput() );
-      REST2\Response::output( $DATA );
-      break;
+  switch ( $METHOD ) {
 
-    default:
-      REST2\Response::outputError(404);
-      break;
+  # PUT /
+  case "put":
+    $DATA->setInternal( REST2\Request::getInput() );
 
+  # GET /
+  case "head":
+  case "get":
+    REST2\Response::output( $DATA );
+    break;
+
+  # Other methods
+  default:
+    REST2\Response::outputError(405);
   }
-
   break;
 
+
+# Any other path...
 default:
-  REST2\Response::outputError(405);
-  break;
+
+  REST2\Response::outputError(404);
 
 }
