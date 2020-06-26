@@ -5,21 +5,25 @@ openlog("myScriptLog", LOG_PID | LOG_PERROR, LOG_LOCAL0);
 // Import our core library
 require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/index.php' );
 
-$DATA = new REST2\JSONFile( dirname(__FILE__) . "/data.json" );
+// Import our JSON file library
+require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/File/index.php' );
 
-$method = REST2\Request::getMethod();
-$path = REST2\Request::getPath();
+$DATA = new REST2\File\JSON( dirname(__FILE__) . "/data.json" );
 
-syslog(LOG_INFO, "Request '$method' '$path'");
+$METHOD = REST2\Request::getMethod();
+$PATH = REST2\Request::getPath();
 
-switch ( $method ) {
+syslog(LOG_INFO, "Request '$METHOD' '$PATH'");
 
+switch ( $METHOD ) {
+
+case "head":
 case "get":
 
-  switch ( $path ) {
+  switch ( $PATH ) {
 
     case "/hello":
-      REST2\Response::outputJSON( $DATA['hello'] );
+      REST2\Response::outputJSON( $DATA->hello );
       break;
 
     case "/":
@@ -36,15 +40,15 @@ case "get":
 
 case "put":
       
-  switch ( $path ) {
+  switch ( $PATH ) {
 
     case "/hello":
-      $DATA['hello'] = REST2\Request::getInput();
-      REST2\Response::outputJSON( $DATA['hello'] );
+      $DATA->hello = REST2\Request::getInput();
+      REST2\Response::outputJSON( $DATA->hello );
       break;
 
     case "/":
-      $DATA = REST2\Request::getInput();
+      $DATA->setInternal( REST2\Request::getInput() );
       REST2\Response::output( $DATA );
       break;
 

@@ -4,9 +4,9 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST2;
+namespace REST2\File;
 
-class JSONFile {
+class JSON implements \JsonSerializable {
 
   private $changed = false;
   private $file = null;
@@ -20,6 +20,23 @@ class JSONFile {
 
   }
 
+  public function setInternal ($data) {
+
+    $this->data = $data;
+
+    $this->changed = true;
+
+  }
+
+  public function __isset ($property) {
+    return isset($this->data[$property]);
+  }
+
+  public function __unset ($property) {
+    $this->changed = true;
+    unset($this->data[$property]);
+  }
+
   public function __get ($property) {
     if ( isset($this->data[$property]) ) {
       return $this->data[$property];
@@ -29,7 +46,6 @@ class JSONFile {
   public function __set ($property, $value) {
     $this->changed = true;
     $this->data[$property] = $value;
-    return $this;
   }
 
   public function __destruct () {
@@ -38,6 +54,14 @@ class JSONFile {
       file_put_contents( $this->file, json_encode($this->data) . "\n" );
     }
 
+  }
+
+  public function __toString () {
+    return json_encode($this->data);
+  }
+
+  public function jsonSerialize () {
+    return $this->data;
   }
 
 }

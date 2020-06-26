@@ -103,8 +103,8 @@ class Response {
 
 	protected static function outputStatus () {
 
-		$code = self::$statusCode;
-		$message = self::$statusMessage;
+		$code = self::$statusCode == null ? 200 : self::$statusCode;
+		$message = self::$statusMessage == null ? HTTPStatusMessages::getMessage($code) : self::$statusMessage;
 
 		header("Status: $code $message");
 		header("HTTP/1.0 $code $message");
