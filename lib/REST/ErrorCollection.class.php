@@ -17,7 +17,7 @@ class ErrorCollection extends Collection {
 		$body = array(
 			'$ref' => $request->getURL()
 		);
-		$messages = HTTPStatusMessages::getAll();
+		$messages = \REST2\HTTPStatusMessages::getAll();
 		foreach ($messages as $key => $message) {
 			$body[$key] = array(
 				'$ref' => $request->getRelativeURL($key),

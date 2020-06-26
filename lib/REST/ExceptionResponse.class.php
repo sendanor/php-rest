@@ -21,7 +21,7 @@ class ExceptionResponse extends Response {
 	}
 
 	public function getStatus () {
-		if($this->error instanceof HTTPError) {
+		if($this->error instanceof \REST2\HTTPError) {
 			return array($this->error->getCode(), $this->error->getMessage());
 		}
 		return array(500, 'Backend Error');

@@ -31,7 +31,7 @@ abstract class DatabaseCollection extends DatabaseResource implements iCollectio
 		$table = $this->getTable();
 		$input = $request->getInput();
 		if (!is_array($input)) {
-			throw new HTTPError(400, "input-invalid");
+			throw new \REST2\HTTPError(400, "input-invalid");
 		}
 		$id = $table->insert($input);
 		return $table->selectById($id);

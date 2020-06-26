@@ -87,7 +87,7 @@ class API {
 			$resource = $router->getResource($request->getPath(), $params);
 
 			if(!$resource) {
-				throw new HTTPError(404, "resource-not-found");
+				throw new \REST2\HTTPError(404, "resource-not-found");
 			}
 
 			if(is_array($params)) {
@@ -97,11 +97,11 @@ class API {
 			$method = $request->getMethod();
 
 			if (!API::isMethod($method)) {
-				throw new HTTPError(405, "method-not-supported");
+				throw new \REST2\HTTPError(405, "method-not-supported");
 			}
 
 			if (!method_exists($resource, $method)) {
-				throw new HTTPError(405, "no-method");
+				throw new \REST2\HTTPError(405, "no-method");
 			}
 
 			$data = $resource->$method($request);

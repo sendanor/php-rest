@@ -25,7 +25,7 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$values = array_values($params);
 		$id = array_pop($values);
 		if (!$table->existsById($id)) {
-			throw new HTTPError(404);
+			throw new \REST2\HTTPError(404);
 		}
 		return $table->selectById($id);
 	}
@@ -37,7 +37,7 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$values = array_values($params);
 		$id = array_pop($values);
 		if (!$table->existsById($id)) {
-			throw new HTTPError(404);
+			throw new \REST2\HTTPError(404);
 		}
 		$table->deleteById($id);
 		return array('deleted' => 'success', 'id' => $id);
@@ -50,7 +50,7 @@ abstract class DatabaseElement extends DatabaseResource implements iElement {
 		$values = array_values($params);
 		$id = array_pop($values);
 		if (!$table->existsById($id)) {
-			throw new HTTPError(404);
+			throw new \REST2\HTTPError(404);
 		}
 		$input = $request->getInput();
 		$table->updateById($id, $input);

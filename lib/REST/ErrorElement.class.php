@@ -18,7 +18,7 @@ class ErrorElement extends Element {
 		$values = array_values($params);
 		$code = intval(end($values));
 		return array(
-			'error' => HTTPStatusMessages::getMessage($code),
+			'error' => \REST2\HTTPStatusMessages::getMessage($code),
 			'code' => $code
 		);
 	}
