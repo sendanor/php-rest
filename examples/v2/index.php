@@ -26,7 +26,7 @@ case "/hello":
   case "put":
     $DATA->hello = REST2\Request::getInput();
 
-  # GET|HEAD /
+  # GET|HEAD /hello
   case "head":
   case "get":
     REST2\Response::outputJSON( $DATA->hello );
