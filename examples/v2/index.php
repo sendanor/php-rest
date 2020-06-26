@@ -8,10 +8,10 @@ require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/index.php' );
 // Import our JSON file library
 require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/File/index.php' );
 
-$DATA = new REST2\File\JSON( dirname(__FILE__) . "/data.json" );
+$DATA   = new REST2\File\JSON( dirname(__FILE__) . "/data.json" );
 
 $METHOD = REST2\Request::getMethod();
-$PATH = REST2\Request::getPath();
+$PATH   = REST2\Request::getPath();
 
 syslog(LOG_INFO, "Request '$METHOD' '$PATH'");
 
