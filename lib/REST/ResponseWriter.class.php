@@ -50,17 +50,14 @@ class ResponseWriter implements iResponseWriter {
 	}
 
 	/** Set HTTP status code */
-	static public function setStatus ($code, $message) {
-		if(headers_sent()) {
-			Log::write('Warning! Headers were sent already, could not send.');
-			return;
+	static public function setStatus ($code, $message = null) {
+
+		try {
+			\REST2\setStatus($code, $message);
+		} catch (Exception $e) {
+			Log::write('Warning! Failed to set headers: '. $e);
 		}
-		if(!defined('HTTPErrorStatus')) {
-			//Log::write('Setting status code as ' . $code);
-			define('HTTPErrorStatus', TRUE);
-			header("Status: $code $message");
-			header("HTTP/1.0 $code $message");
-		}
+
 	}
 
 	/** Set HTTP status code */
@@ -75,9 +72,6 @@ class ResponseWriter implements iResponseWriter {
 		}
 
 		if ( (!is_null($code)) && $code) {
-			if(is_null($message)) {
-				$message = HTTPStatusMessages::getMessage($code);
-			}
 			self::setStatus($code, $message);
 		}
 	}

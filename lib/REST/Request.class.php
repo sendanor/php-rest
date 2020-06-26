@@ -23,14 +23,10 @@ class Request implements iRequest {
 
 	/** */
 	function __construct() {
-		$this->method = strtolower( isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'get' );
-		$this->path = isset($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/';
-		$this->query = (array)$_GET;
-		if($this->method === "get") {
-			$this->input = $this->query;
-		} else {
-			$this->input = json_decode(file_get_contents('php://input'), true);
-		}
+		$this->method = \REST2\Request::getMethod();
+		$this->path = \REST2\Request::getPath();
+		$this->query = \REST2\Request::getQueryParams();
+		$this->input = \REST2\Request::getInput();
 		$this->params = array();
 	}
 
