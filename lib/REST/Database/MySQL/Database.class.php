@@ -4,8 +4,10 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST\MySQL;
+namespace REST\Database\MySQL;
 
+use \REST\Database\iDatabase as iDatabase;
+use \REST\Database\iDatabaseTable as iDatabaseTable;
 use Exception;
 
 /* Security check */

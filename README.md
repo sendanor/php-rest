@@ -263,6 +263,17 @@ available.
 
 ---------------------------------------------------------------------------------------
 
+### Running local PHP for development
+
+```
+cd examples
+php -S localhost:8000
+```
+
+...and open http://localhost:8000
+
+---------------------------------------------------------------------------------------
+
 ### Testing the API with *curl*
 
 Source code for the example API at [examples/](examples/).

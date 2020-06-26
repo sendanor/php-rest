@@ -41,11 +41,6 @@ function addAutoloadPath ($path) {
 	return Autoloader::add($path);
 }
 
-/** Set database */
-function setDatabase (iDatabase $db) {
-	return API::setDatabase($db);
-}
-
 /** Set default headers */
 function setDefaultHeaders (array $headers) {
 	return API::setDefaultHeaders($headers);

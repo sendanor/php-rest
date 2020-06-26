@@ -1,12 +1,13 @@
 <?php
-/* 
+/*
  * Sendanor's PHP REST Framework
- * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com> 
+ * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com>
  */
 
-namespace REST\MySQL;
+namespace REST\Database;
 
-use REST\iCollection;
+use \REST\iRequest as iRequest;
+use \REST\iCollection as iCollection;
 
 /* Security check */
 if(!defined('REST_PHP')) {

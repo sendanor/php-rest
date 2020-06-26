@@ -6,11 +6,14 @@ define('RESTExample', TRUE);
 // Read configuration from config.php
 require('config.php');
 
-// Import our framework
+// Import our core framework
 require( dirname(dirname(__FILE__)) . '/lib/REST/index.php');
 
+// Enable database support
+require( dirname(dirname(__FILE__)) . '/lib/REST/Database/index.php');
+
 // Add our own path to REST autoloader
-REST\addAutoloadPath(dirname(__FILE__) . '/src');
+\REST\addAutoloadPath(dirname(__FILE__) . '/src');
 
 // Enable autoloader
 function __autoload ($className) {
@@ -21,21 +24,21 @@ function __autoload ($className) {
 if (!defined('REST_TABLE_PREFIX')) {
     define('REST_TABLE_PREFIX', '');
 }
-$db = new REST\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
+$db = new REST\Database\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
 $db->charset(REST_CHARSET);
 $db->setTablePrefix(REST_TABLE_PREFIX);
-REST\setDatabase($db);
+\REST\Database\setDefaultDatabase($db);
 
 // Enable automatic support for OPTIONS
-REST\enableAutoOptions();
+\REST\enableAutoOptions();
 
 // Enable CORS
-REST\setDefaultHeaders(array(
+\REST\setDefaultHeaders(array(
 	'Access-Control-Allow-Origin' => '*'
 ));
 
 // Run current request
-REST\run(array(
+\REST\run(array(
 	"/" => "RootElement",
 	"/contact" => "ContactCollection",
 	"/contact/:contact_id" => "ContactElement",

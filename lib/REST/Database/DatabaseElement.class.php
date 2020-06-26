@@ -1,19 +1,19 @@
 <?php
 /* 
  * Sendanor's PHP REST Framework
- * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com> 
+ * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com>
  */
 
-namespace REST\MySQL;
+namespace REST\Database;
 
-use REST\iElement;
+use \REST\iElement as iElement;
 
 /* Security check */
 if(!defined('REST_PHP')) {
 	die("Direct access not permitted\n");
 }
 
-/** Implementation of row in a database table as a REST element resource. The 
+/** Implementation of row in a database table as a REST element resource. The
  * last parameter in the URL must be the primary key of the row.
  */
 abstract class DatabaseElement extends DatabaseResource implements iElement {

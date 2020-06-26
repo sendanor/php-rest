@@ -6,6 +6,7 @@
 
 namespace REST;
 
+use \REST\Database\iDatabase as iDatabase;
 use Exception;
 
 /* Security check */

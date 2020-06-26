@@ -4,7 +4,7 @@
  * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com> 
  */
 
-namespace REST\MySQL;
+namespace REST\Database\MySQL;
 
 use Exception;
 
@@ -14,7 +14,7 @@ if(!defined('REST_PHP')) {
 }
 
 /** Interface for database tables */
-class DatabaseTable implements iDatabaseTable {
+class DatabaseTable implements REST\Database\iDatabaseTable {
 
 	private $db = NULL;
 	private $name = NULL;
@@ -36,13 +36,13 @@ class DatabaseTable implements iDatabaseTable {
 	protected $delete_byid_format  = 'DELETE FROM `%s` WHERE `%s` = "%s" LIMIT 1';
 
 	/** Construct an interface for database table */
-	public function __construct (iDatabase $db, $name) {
+	public function __construct (REST\Database\iDatabase $db, $name) {
 		$this->db = $db;
 		$this->name = $name;
 	}
 
 	/** Set database interface */
-	public function setDatabase (iDatabase $db) {
+	public function setDatabase (REST\Database\iDatabase $db) {
 		$this->db = $db;
 		return $this;
 	}

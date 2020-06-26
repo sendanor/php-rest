@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST\MySQL;
+namespace REST\Database;
 
 /* Security check */
 if(!defined('REST_PHP')) {
