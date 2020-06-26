@@ -21,8 +21,10 @@ class Autoloader {
 
 	/** Init static values */
 	static public function init () {
+
 		if(is_null(self::$dirs)) {
 			self::$dirs = array(dirname(dirname(__FILE__)));
+
 		}
 	}
 
@@ -31,6 +33,7 @@ class Autoloader {
 	 * otherwise false.
 	 */
 	static public function load ($className) {
+
 		//Log::write("Autoloader::load($className)");
 		$className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
 		self::init();
@@ -52,12 +55,16 @@ class Autoloader {
 			}
 		}
 		return false;
-	} 
+
+	}
 
 	/** Add path to autoloader */
 	static public function add ($path) {
+
 		self::init();
+
 		array_unshift(self::$dirs, $path);
+
 	}
 
 }

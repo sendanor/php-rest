@@ -1,10 +1,10 @@
 <?php
-/* 
+/*
  * Sendanor's PHP REST Framework
- * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com> 
+ * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST;
+namespace REST\MySQL;
 
 /* Security check */
 if(!defined('REST_PHP')) {

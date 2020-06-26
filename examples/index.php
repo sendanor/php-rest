@@ -21,7 +21,7 @@ function __autoload ($className) {
 if (!defined('REST_TABLE_PREFIX')) {
     define('REST_TABLE_PREFIX', '');
 }
-$db = new REST\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
+$db = new REST\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
 $db->charset(REST_CHARSET);
 $db->setTablePrefix(REST_TABLE_PREFIX);
 REST\setDatabase($db);

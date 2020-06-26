@@ -4,7 +4,9 @@
  * Copyright 2017 Jaakko-Heikki Heusala <jhh@sendanor.com> 
  */
 
-namespace REST;
+namespace REST\MySQL;
+
+use REST\Resource;
 
 /* Security check */
 if (!defined('REST_PHP')) {

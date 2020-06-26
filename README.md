@@ -2,12 +2,14 @@
 
 Simple object oriented PHP Framework to build JSON REST APIs.
 
-> It's ***2017***. Why PHP? Node.js is better!
+> It's ***2020***. Why PHP? Node.js is better!
 
-* **Less dependencies.** `php-rest` only requires PHP 5.3 features. No other external requirements.
-* **Long Term Support.** This software will work unchanged next year, and probably in the year 2027, too. We'll need something like a zombie apocalypse to make it obsolete.
+* **Less dependencies.** `php-rest` only requires PHP 7 features. No other external requirements.
+* **Long Term Support.** This software will work unchanged next year, and probably in the year 2030, too. We'll need something like a zombie apocalypse to make it obsolete.
 * **Easy deployment.** No need to setup process supervisors; your OS and *Apache* (or whatever HTTP server you use) already does that.
 * **Less disk space.** `php-rest` is about 836 kB. *Our Node.js API framework takes* ***freaking*** *182 MB.*
+
+---------------------------------------------------------------------------------------
 
 ### It's a framework, not a library.
 
@@ -20,6 +22,8 @@ too much about the internal implementation details.
 We use it to build backend APIs for our Node.js backends -- especially for our 
 legacy projects.
 
+---------------------------------------------------------------------------------------
+
 ### About our terminology
 
 *Resource* is any REST path which you can make HTTP requests with different 
@@ -31,26 +35,36 @@ These are normally other elements. It's like a database table.
 *Element* is a resource which lets you interact with a single item. It's like a 
 row in a database table.
 
+---------------------------------------------------------------------------------------
+
 ### Requirements
 
-* PHP 5.3. or newer
+* PHP 7.2 or newer
 
 Optional features:
 
 * ***Web server software:*** *Apache*, *Nginx*, etc
 * ***Database Server:*** *MySQL* Server 5.0. or newer
 
+---------------------------------------------------------------------------------------
+
 ### Install
 
 `npm install --save php-rest`
 
+---------------------------------------------------------------------------------------
+
 ### Using `php-rest` with *Apache*
+
+---------------------------------------------------------------------------------------
 
 #### Securing your API with HTTPS
 
-Using HTTPS in the year 2017 is recommended, free and there isn't many good 
+Using HTTPS in the year 2020 is recommended, free and there isn't many good 
 reasons not to use it. We recommend using [Let's Encrypt](https://letsencrypt.org/). 
 *Apache* has a good support for it, too.
+
+---------------------------------------------------------------------------------------
 
 #### Securing the project folder with `.htaccess`
 
@@ -60,6 +74,8 @@ a starting point.
 
 You can -- and probably *should* -- also use it to control who can make POST, 
 PUT and DELETE requests. ***`php-rest` doesn't have any ACL support built-in.***
+
+---------------------------------------------------------------------------------------
 
 ##### Basic HTTP Authentication
 
@@ -91,10 +107,14 @@ Require valid-user
 ***Please note:*** You can also use *MySQL* instead of files with 
 [mod_authn_dbd](https://httpd.apache.org/docs/2.4/mod/mod_authn_dbd.html).
 
+---------------------------------------------------------------------------------------
+
 #### Setup a front controller
 
 Your REST backend will operate from a single front controller -- our example 
 uses [index.php](examples/index.php).
+
+---------------------------------------------------------------------------------------
 
 ##### Pass everything to the front controller
 
@@ -106,6 +126,8 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
 ```
+
+---------------------------------------------------------------------------------------
 
 ##### Enable autoloader
 
@@ -124,6 +146,8 @@ You should let it know where to find your business logic classes:
 REST\addAutoloadPath(dirname(__FILE__) . '/src')
 ```
 
+---------------------------------------------------------------------------------------
+
 ##### Enable database support
 
 If you want to use our built-in MySQL database support, you need to configure 
@@ -136,6 +160,8 @@ $db->charset(REST_CHARSET);
 $db->setTablePrefix(REST_TABLE_PREFIX);
 REST\setDatabase($db);
 ```
+
+---------------------------------------------------------------------------------------
 
 ###### Extending from `REST\DatabaseElement` and `REST\DatabaseCollection`
 
@@ -151,11 +177,15 @@ Of course, you can extend or overwrite any method.
 DatabaseElement -- or anything extended from it -- to the public, it will let 
 delete and modify any row in your *MySQL* table.
 
+---------------------------------------------------------------------------------------
+
 ##### Expose automatic API documentation with OPTIONS method
 
 `php-rest` can automatically use PHP's ReflectionClass to read documentation 
 from PHPdoc comments in your implementation and provide it to users as OPTIONS 
 method. To enable this feature use `REST\enableAutoOptions();`.
+
+---------------------------------------------------------------------------------------
 
 ##### Setup routes to resource implementations
 
@@ -168,6 +198,8 @@ REST\run(array(
     "/contact/:contact_id" => "ContactElement"
 ));
 ```
+
+---------------------------------------------------------------------------------------
 
 #### Writing REST resources
 
@@ -196,28 +228,40 @@ class RootElement extends REST\Element {
 ***Note:*** You can also call `parent::get($request)` to use the parent 
 implementation.
 
+---------------------------------------------------------------------------------------
+
 ##### `$request->getPath()`
 
 Returns the path of the request, like `/Contact/1`.
+
+---------------------------------------------------------------------------------------
 
 ##### `$request->getParams()`
 
 Returns the route parameters, like `1` for `$params['contact_id']` if route had 
 path like `/Contact/:contact_id`.
 
+---------------------------------------------------------------------------------------
+
 ##### `$request->getQuery()`
 
 Returns the request query params, like `/Contact?email=foo@example.com` ==> 
 `$query['email']` ==> `'foo@example.com'`.
 
+---------------------------------------------------------------------------------------
+
 ##### `$request->getInput()`
 
 Returns the parsed JSON body from the request.
+
+---------------------------------------------------------------------------------------
 
 ##### Other methods
 
 See [Request.class.php](lib/REST/Request.class.php) for other public methods 
 available.
+
+---------------------------------------------------------------------------------------
 
 ### Testing the API with *curl*
 
