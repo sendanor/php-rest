@@ -136,14 +136,14 @@ enable in your front controller:
 
 ```
 function __autoload ($className) {
-	return REST\Autoloader::load($className);
+	return \REST\Autoloader::load($className);
 }
 ```
 
 You should let it know where to find your business logic classes:
 
 ```
-REST\addAutoloadPath(dirname(__FILE__) . '/src')
+\REST\addAutoloadPath(dirname(__FILE__) . '/src')
 ```
 
 ---------------------------------------------------------------------------------------
@@ -154,16 +154,17 @@ If you want to use our built-in MySQL database support, you need to configure
 it:
 
 ```
-$db = new REST\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, 
+require_once('path/to/REST/Database/index.php');
+$db = new \REST\Database\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, 
 REST_DATABASE);
 $db->charset(REST_CHARSET);
 $db->setTablePrefix(REST_TABLE_PREFIX);
-REST\setDatabase($db);
+\REST\Database\setDefaultDatabase($db);
 ```
 
 ---------------------------------------------------------------------------------------
 
-###### Extending from `REST\DatabaseElement` and `REST\DatabaseCollection`
+###### Extending from `\REST\Database\DatabaseElement` and `\REST\Database\DatabaseCollection`
 
 These classes implement complete REST resources to use *MySQL* tables with 
 *GET*, *POST*, *PUT*, and *DELETE* operations.
@@ -183,7 +184,7 @@ delete and modify any row in your *MySQL* table.
 
 `php-rest` can automatically use PHP's ReflectionClass to read documentation 
 from PHPdoc comments in your implementation and provide it to users as OPTIONS 
-method. To enable this feature use `REST\enableAutoOptions();`.
+method. To enable this feature use `\REST\enableAutoOptions();`.
 
 ---------------------------------------------------------------------------------------
 
@@ -192,7 +193,7 @@ method. To enable this feature use `REST\enableAutoOptions();`.
 Finally you'll need to map your routes to your business logic classes.
 
 ```
-REST\run(array(
+\REST\run(array(
     "/" => "RootElement",
     "/contact" => "ContactCollection",
     "/contact/:contact_id" => "ContactElement"
@@ -205,9 +206,9 @@ REST\run(array(
 
 You can extend from our abstract classes:
 
-* `REST\Element`, `REST\Collection`, or `REST\Resource` for non-database 
+* `\REST\Element`, `\REST\Collection`, or `\REST\Resource` for non-database 
 resources
-* `REST\DatabaseElement`, `REST\DatabaseCollection`, or `REST\DatabaseResource` 
+* `\REST\Database\DatabaseElement`, `\REST\Database\DatabaseCollection`, or `\REST\Database\DatabaseResource` 
 for MySQL-based resources
 
 When you want to overwrite a built-in method, you simply write a function with 
@@ -215,7 +216,7 @@ the name of the method:
 
 ```
 /** The root resource for this REST service */
-class RootElement extends REST\Element {
+class RootElement extends \REST\Element {
         /** Doesn't return anything useful yet. Simply a hello world. */
         function get (iRequest $request) {
                 return array(
