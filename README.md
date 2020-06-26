@@ -209,7 +209,7 @@ You can extend from our abstract classes:
 * `\REST\Element`, `\REST\Collection`, or `\REST\Resource` for non-database 
 resources
 * `\REST\Database\DatabaseElement`, `\REST\Database\DatabaseCollection`, or `\REST\Database\DatabaseResource` 
-for MySQL-based resources
+for database-based resources
 
 When you want to overwrite a built-in method, you simply write a function with 
 the name of the method:
