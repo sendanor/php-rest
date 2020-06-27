@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi> 
  */
 
-namespace REST2;
+namespace SimpleREST;
 
 if(!defined('REST_PHP')) {
 	define('REST_PHP', TRUE);

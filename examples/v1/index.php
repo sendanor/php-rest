@@ -7,10 +7,10 @@ define('RESTExample', TRUE);
 require('config.php');
 
 // Import our core framework
-require( dirname(dirname(dirname(__FILE__))) . '/lib/REST/index.php');
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Framework/index.php');
 
 // Enable database support
-require( dirname(dirname(dirname(__FILE__))) . '/lib/REST/Database/index.php');
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Framework/Database/index.php');
 
 // Add our own path to REST autoloader
 \REST\addAutoloadPath(dirname(__FILE__) . '/src');

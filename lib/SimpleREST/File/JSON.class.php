@@ -4,17 +4,27 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST2\File;
+namespace SimpleREST\File;
 
+/**
+ * Implements read/write accessor for JSON data on a file in the filesystem.
+ *
+ */
 class JSON implements \JsonSerializable {
 
   private $changed = false;
   private $file = null;
   private $data = null;
+  private $lock = null;
 
-  public function __construct ( $file ) {
+  /**
+   * Note! If you disable using lock file, this implementation might not be production ready.
+   */
+  public function __construct ( $file, $use_lock = true ) {
 
     $this->file = $file;
+
+    $this->lock = $use_lock === true ? new Lock( $file . ".lock" ) : null;
 
     $this->data = file_exists($file) ? json_decode(file_get_contents($file), true) : array();
 
@@ -52,6 +62,10 @@ class JSON implements \JsonSerializable {
 
     if ($this->changed) {
       file_put_contents( $this->file, json_encode($this->data) . "\n" );
+    }
+
+    if ( $this->lock !== null ) {
+      $this->lock->release();
     }
 
   }

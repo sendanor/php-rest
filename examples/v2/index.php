@@ -1,19 +1,19 @@
 <?php
 
 // Import our core library
-require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/index.php' );
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/index.php' );
 
 // Import our JSON file library
-require( dirname(dirname(dirname(__FILE__))) . '/lib/REST2/File/index.php' );
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
 
-use REST2\Logger\Syslog as Logger;
+use SimpleREST\Logger\Syslog as Logger;
 $logger = new Logger("myScriptLog");
 
-use REST2\File\JSON as File;
+use SimpleREST\File\JSON as File;
 $DATA   = new File( dirname(__FILE__) . "/data.json" );
 
-use REST2\Request as Request;
-use REST2\Response as Response;
+use SimpleREST\Request as Request;
+use SimpleREST\Response as Response;
 
 $METHOD = Request::getMethod();
 $PATH   = Request::getPath();

@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace REST2;
+namespace SimpleREST;
 
 use Exception;
 
