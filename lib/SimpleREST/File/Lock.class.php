@@ -34,39 +34,71 @@ class Lock {
 
   }
 
-  /** Locks the file handle */
-  protected function lockFileHandle ($operation = LOCK_EX) {
+  /** Try locking again, see lockFileHandle() below */
+  protected function relockFileHandle ( $operation ) {
 
-    if (flock($this->fp, $operation)) {
+    $this->unlockFileHandle();
 
-      // Check if another process managed to get a lock while we were waiting and removed the lock file...
-      if (!file_exists($this->file)) {
+    $this->closeFileHandle();
 
-	// Release lock and try again
-        $this->unlockFileHandle();
-        $this->closeFileHandle();
+    $this->openFileHandle();
 
-        $this->openFileHandle();
+    return $this->lockFileHandle($operation);
 
-        return $this->lockFileHandle($operation);
+  }
 
+  /** Get file handle inode
+   *
+   * Remember! You must use `clearstatcache()` first.
+   */
+  static protected function getFileHandleInode ( $fp ) {
+
+      $fstat = fstat($fp);
+
+      return $fstat['ino'];
+
+  }
+
+  /** Truncates the file handle and writes our PID in it */
+  protected function postLockFileHandle () {
+
+      if ( ftruncate($this->fp, 0) === FALSE ) {
+        throw new Exception('Failed to lock file handle: ftruncate failed');
       }
 
-      ftruncate($this->fp, 0);
+      if ( fwrite($this->fp, "" . getmypid() ) == FALSE ) {
+        throw new Exception('Failed to lock file handle: fwrite failed');
+      }
 
-      fwrite($this->fp, "" . getmypid() );
+  }
 
-      $this->locked = true;
+  /** Locks the file handle and calls `$this->postLockFileHandle()` */
+  protected function lockFileHandle ( $operation ) {
 
-    } else {
+    if (flock($this->fp, $operation) === FALSE) {
 
-      fclose($this->fp);
-
-      $this->fp = null;
+      $this->closeFileHandle();
 
       throw new Exception('Could not get a lock for ' . $file);
 
     }
+
+    // We must clear cache for file_exists() and fstat()
+    clearstatcache();
+
+    // Check if another process managed to get a lock while we were waiting and removed the lock file...
+    if ( file_exists($this->file) === FALSE ) {
+      return $this->relockFileHandle($operation);
+    }
+
+    // Check if another process managed to create a new different lock file with same name...
+    if ( self::getFileHandleInode($this->fp) !== fileinode($this->file) ) {
+      return $this->relockFileHandle($operation);
+    }
+
+    $this->locked = true;
+
+    $this->postLockFileHandle();
 
   }
 
@@ -75,8 +107,14 @@ class Lock {
 
     if ($this->locked) {
 
-      fflush($this->fp);
-      flock($this->fp, LOCK_UN);
+      if ( fflush($this->fp) === FALSE ) {
+        // FIXME: Should print a warning
+      }
+
+      if ( flock($this->fp, LOCK_UN) === FALSE ) {
+        // FIXME: Should print a warning
+      }
+
       $this->locked = false;
 
     }
@@ -86,9 +124,11 @@ class Lock {
   /** Open the file handle */
   protected function openFileHandle () {
 
+    clearstatcache();
+
     $this->fp = fopen($this->file, file_exists($this->file) ? "r+" : "c" );
 
-    if (!$this->fp) {
+    if ( $this->fp === FALSE ) {
       throw new Exception('Cannot create lock file!');
     }
 
@@ -97,9 +137,14 @@ class Lock {
   /** Close file handle */
   protected function closeFileHandle () {
 
-    if ($this->fp) {
-      fclose($this->fp);
+    if ( $this->fp !== null ) {
+
+      if ( fclose($this->fp) === FALSE ) {
+        // FIXME: Should print a warning
+      }
+
       $this->fp = null;
+
     }
 
   }
@@ -107,9 +152,16 @@ class Lock {
   /** Remove link file */
   protected function removeLinkFile () {
 
-    if ($this->file) {
-      unlink($this->file);
+    if ( $this->file !== null ) {
+
+      if ( unlink($this->file) === FALSE ) {
+        // FIXME: Should print a warning
+      }
+
+      clearstatcache();
+
       $this->file = null;
+
     }
 
   }
@@ -118,7 +170,9 @@ class Lock {
   public function release () {
 
     $this->removeLinkFile();
+
     $this->unlockFileHandle();
+
     $this->closeFileHandle();
 
   }
