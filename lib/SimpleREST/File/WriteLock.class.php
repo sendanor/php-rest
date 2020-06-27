@@ -54,6 +54,15 @@ class WriteLock extends BaseLock {
 
   }
 
+  /** */
+  protected function preUnlockFileHandle () {
+
+      if ( fflush($this->getFileHandle()) === FALSE ) {
+        syslog(LOG_WARNING, "fflush() failed for lock file.");
+      }
+
+  }
+
   /** Release lock if it is locked */
   public function release () {
 

@@ -47,16 +47,16 @@ abstract class BaseLock {
     return $this->file;
   }
 
+  /** Returns true if file handle is open */
+  protected function isFileHandleOpen () {
+    return $this->getFileHandle() !== null;
+  }
+
   /** Nullifies the link file name. You should use this if you remove the file from disk. */
   protected function clearLinkFileName () {
 
     $this->file = null;
 
-  }
-
-  /** Returns lock file handle */
-  protected function getFileHandle () {
-    return $this->fp;
   }
 
   /** Try locking again, see lockFileHandle() below */
@@ -88,16 +88,42 @@ abstract class BaseLock {
    */
   protected function isFileHandleLinked () {
 
-    $fstat = fstat($this->fp);
+    $fp = $this->getFileHandle();
+
+    if ($fp === null) throw new Exception('File handle was not open');
+
+    $fstat = fstat($fp);
 
     return $fstat['nlink'] >= 1;
 
   }
 
-  /** Locks the file handle and calls `$this->postLockFileHandle()` */
+  /**
+   * This is raw flock() which only sets $this->locked
+   */
+  protected function internalLockFileHandle ( $operation ) {
+
+    $fp = $this->getFileHandle();
+
+    if ($fp === null) throw new Exception('File handle not open');
+
+    if (flock($fp, $operation)) {
+      $this->locked = true;
+      return TRUE;
+    }
+
+    return FALSE;
+
+  }
+
+  /** Locks the file handle and calls `$this->postLockFileHandle()`
+   *
+   * Note! This call will throw an exception if it cannot get a lock. Use internalLockFileHandle() if you want to use non-blocking flock() and call postLockFileHandle() yourself, if need to.
+   *
+   */
   protected function lockFileHandle ( $operation ) {
 
-    if (flock($this->fp, $operation) === FALSE) {
+    if ( $this->internalLockFileHandle($operation) === FALSE ) {
 
       $this->closeFileHandle();
 
@@ -105,10 +131,12 @@ abstract class BaseLock {
 
     }
 
-    $this->locked = true;
-
     $this->postLockFileHandle( $operation );
 
+  }
+
+  /** */
+  protected function preUnlockFileHandle () {
   }
 
   /** Release the lock on file handle */
@@ -116,11 +144,13 @@ abstract class BaseLock {
 
     if ($this->locked) {
 
-      if ( fflush($this->fp) === FALSE ) {
-        syslog(LOG_WARNING, "fflush() failed for lock file.");
-      }
+      $this->preUnlockFileHandle();
 
-      if ( flock($this->fp, LOCK_UN) === FALSE ) {
+      $fp = $this->getFileHandle();
+
+      if ($fp === null) throw new Exception('File handle not open');
+
+      if ( flock($fp, LOCK_UN) === FALSE ) {
         syslog(LOG_WARNING, "Unlocking lock file failed.");
       }
 
@@ -128,6 +158,11 @@ abstract class BaseLock {
 
     }
 
+  }
+
+  /** Returns lock file handle */
+  protected function getFileHandle () {
+    return $this->fp;
   }
 
   /** Open the file handle */
@@ -144,9 +179,11 @@ abstract class BaseLock {
   /** Close file handle */
   protected function closeFileHandle () {
 
-    if ( $this->fp !== null ) {
+    $fp = $this->getFileHandle();
 
-      if ( fclose($this->fp) === FALSE ) {
+    if ( $fp !== null ) {
+
+      if ( fclose($fp) === FALSE ) {
         syslog(LOG_WARNING, "fclose() failed for lock file.");
       }
 

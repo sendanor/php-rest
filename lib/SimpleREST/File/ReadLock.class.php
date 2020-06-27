@@ -55,6 +55,27 @@ class ReadLock extends BaseLock {
 
     $this->unlockFileHandle();
 
+    // We must clear cache for isFileHandleLinked()
+    clearstatcache();
+
+    // Try to obtain write lock to unlink the file
+    if ( $this->isFileHandleOpen() && $this->isFileHandleLinked() && $this->internalLockFileHandle(LOCK_EX|LOCK_NB) ) {
+
+      // We must clear cache for lockFileExists() and isFileHandleLinked()
+      clearstatcache();
+
+      // Check if another process managed to get a lock while we were locking and removed the lock file...
+      // Check if another process managed to create a new different lock file with same name...
+      if ( $this->lockFileExists() && $this->isFileHandleLinked() ) {
+
+        $this->removeLinkFile();
+
+      }
+
+      $this->unlockFileHandle();
+
+    }
+
     $this->closeFileHandle();
 
   }
