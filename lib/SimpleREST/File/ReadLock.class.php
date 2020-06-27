@@ -35,7 +35,7 @@ class ReadLock extends BaseLock {
   /** Truncates the file handle and writes our PID in it */
   protected function postLockFileHandle ( $operation ) {
 
-    // We must clear cache for lockFileExists() and isSameLockFile()
+    // We must clear cache for lockFileExists() and isFileHandleLinked()
     clearstatcache();
 
     // Check if another process managed to get a lock while we were waiting and removed the lock file...
@@ -44,7 +44,7 @@ class ReadLock extends BaseLock {
     }
 
     // Check if another process managed to create a new different lock file with same name...
-    if ( !$this->isSameLockFile() ) {
+    if ( !$this->isFileHandleLinked() ) {
       return $this->relockFileHandle($operation);
     }
 

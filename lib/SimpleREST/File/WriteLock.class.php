@@ -44,7 +44,7 @@ class WriteLock extends BaseLock {
     }
 
     // Check if another process managed to create a new different lock file with same name...
-    if ( !$this->isSameLockFile() ) {
+    if ( !$this->isFileHandleLinked() ) {
       return $this->relockFileHandle($operation);
     }
 

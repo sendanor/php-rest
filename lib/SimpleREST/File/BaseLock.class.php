@@ -82,32 +82,15 @@ abstract class BaseLock {
 
   }
 
-  /** Get file handle inode
+  /** Get count of linked files on the filesystem
    *
    * Remember! You must use `clearstatcache()` first.
    */
-  protected function getFileHandleInode () {
+  protected function isFileHandleLinked () {
 
     $fstat = fstat($this->fp);
 
-    return $fstat['ino'];
-
-  }
-
-  /** Get file inode
-   *
-   * Remember! You must use `clearstatcache()` first.
-   */
-  protected function getFileInode () {
-
-    return fileinode($this->file);
-
-  }
-
-  /** Returns true if lock file is same file as file pointer */
-  protected function isSameLockFile () {
-
-    return $this->getFileHandleInode() === $this->getFileInode();
+    return $fstat['nlink'] >= 1;
 
   }
 
