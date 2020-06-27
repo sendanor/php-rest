@@ -9,7 +9,7 @@ require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' 
 use SimpleREST\Logger\Syslog as Logger;
 $logger = new Logger("myScriptLog");
 
-use SimpleREST\File\JSON as File;
+use SimpleREST\File\EditableJSON as File;
 $DATA   = new File( dirname(__FILE__) . "/data.json" );
 
 use SimpleREST\Request as Request;

@@ -1,53 +1,69 @@
 <?php
-/* 
+/*
  * Sendanor's PHP REST Framework
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
 namespace SimpleREST\File;
 
+use Exception;
+
 /**
- * Implements read/write accessor for JSON data on a file in the filesystem.
+ * Implements lock file implementation
  *
  */
-class JSON implements \JsonSerializable {
+class JSON extends BaseJSON {
 
-  private $changed = false;
-  private $file = null;
-  private $data = null;
-  private $lock = null;
+  private $read_lock = null;
+  protected $data = null;
+  protected $file = null;
 
-  /**
-   * Note! If you disable using lock file, this implementation might not be production ready.
-   */
-  public function __construct ( $file, $use_lock = true ) {
+  /** Create a lock file */
+  public function __construct ( $file ) {
+
+    parent::__construct();
 
     $this->file = $file;
 
-    $this->lock = $use_lock === true ? new WriteLock( $file . ".lock" ) : null;
+    $this->initLock( $file . ".lock" );
+
+    // We must clear cache for file_exists
+    clearstatcache();
 
     $this->data = file_exists($file) ? json_decode(file_get_contents($file), true) : array();
 
   }
 
-  public function setInternal ($data) {
+  /** Automatically releases the lock */
+  public function __destruct () {
 
-    $this->data = $data;
+    if ( $this->getLock() !== null ) {
+      $this->getLock()->release();
+    }
 
-    $this->changed = true;
+    parent::__destruct();
 
+  }
+
+  protected function getLock () {
+
+    return $this->read_lock;
+
+  }
+
+  protected function initLock ($file) {
+
+    $this->read_lock = new ReadLock( $file );
+
+  }
+
+  public function getInternal () {
+    return $this->data;
   }
 
   public function __isset ($property) {
 
     return isset($this->data[$property]);
-
-  }
-
-  public function __unset ($property) {
-
-    $this->changed = true;
-    unset($this->data[$property]);
 
   }
 
@@ -59,36 +75,5 @@ class JSON implements \JsonSerializable {
 
   }
 
-  public function __set ($property, $value) {
-
-    $this->changed = true;
-
-    $this->data[$property] = $value;
-
-  }
-
-  public function __destruct () {
-
-    if ($this->changed) {
-      file_put_contents( $this->file, json_encode($this->data) . "\n" );
-    }
-
-    if ( $this->lock !== null ) {
-      $this->lock->release();
-    }
-
-  }
-
-  public function __toString () {
-
-    return json_encode($this->data);
-
-  }
-
-  public function jsonSerialize () {
-
-    return $this->data;
-
-  }
-
 }
+

@@ -25,6 +25,13 @@ class WriteLock extends BaseLock {
 
   }
 
+  /** Automatically releases the lock */
+  public function __destruct () {
+
+    parent::__destruct();
+
+  }
+
   /** Truncates the file handle and writes our PID in it */
   protected function postLockFileHandle () {
 
@@ -70,9 +77,9 @@ class WriteLock extends BaseLock {
   /** Write data to file handle */
   protected function writeToFileHandle (string $content) {
 
-      if ( fwrite($this->getFileHandle(), $content ) == FALSE ) {
-        throw new Exception('Failed to write to link file handle');
-      }
+    if ( fwrite($this->getFileHandle(), $content ) == FALSE ) {
+      throw new Exception('Failed to write to link file handle');
+    }
 
   }
 

@@ -25,6 +25,13 @@ class ReadLock extends BaseLock {
 
   }
 
+  /** Automatically releases the lock */
+  public function __destruct () {
+
+    parent::__destruct();
+
+  }
+
   /** Truncates the file handle and writes our PID in it */
   protected function postLockFileHandle () {
 
@@ -49,12 +56,6 @@ class ReadLock extends BaseLock {
     $this->unlockFileHandle();
 
     $this->closeFileHandle();
-
-  }
-
-  public function __destruct () {
-
-    $this->__destruct();
 
   }
 

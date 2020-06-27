@@ -23,6 +23,20 @@ abstract class BaseLock {
   /** File handle for lock file */
   private $fp = null;
 
+  /** Create a lock file */
+  public function __construct ( $file ) {
+
+    $this->file = $file;
+
+  }
+
+  /** Automatically releases the lock */
+  public function __destruct () {
+
+    $this->release();
+
+  }
+
   /** Returns if lock is active */
   protected function isLocked () {
     return $this->locked;
@@ -43,13 +57,6 @@ abstract class BaseLock {
   /** Returns lock file handle */
   protected function getFileHandle () {
     return $this->fp;
-  }
-
-  /** Create a lock file */
-  public function __construct ( $file ) {
-
-    $this->file = $file;
-
   }
 
   /** Try locking again, see lockFileHandle() below */
@@ -127,11 +134,11 @@ abstract class BaseLock {
     if ($this->locked) {
 
       if ( fflush($this->fp) === FALSE ) {
-        // FIXME: Should print a warning
+        syslog(LOG_WARNING, "fflush() failed for lock file.");
       }
 
       if ( flock($this->fp, LOCK_UN) === FALSE ) {
-        // FIXME: Should print a warning
+        syslog(LOG_WARNING, "Unlocking lock file failed.");
       }
 
       $this->locked = false;
@@ -143,10 +150,7 @@ abstract class BaseLock {
   /** Open the file handle */
   protected function openFileHandle () {
 
-    // We must clear cache for lockFileExists() and isSameLockFile()
-    clearstatcache();
-
-    $this->fp = fopen($this->file, $this->lockFileExists() ? 'w+' : 'c+' );
+    $this->fp = fopen($this->file, 'c+' );
 
     if ( $this->fp === FALSE ) {
       throw new Exception('Cannot open lock file!');
@@ -160,7 +164,7 @@ abstract class BaseLock {
     if ( $this->fp !== null ) {
 
       if ( fclose($this->fp) === FALSE ) {
-        // FIXME: Should print a warning
+        syslog(LOG_WARNING, "fclose() failed for lock file.");
       }
 
       $this->fp = null;
@@ -175,13 +179,6 @@ abstract class BaseLock {
   /** Release lock if it is locked */
   abstract public function release ();
 
-  /** Automatically releases the lock */
-  public function __destruct () {
-
-    $this->release();
-
-  }
-
   /** Remove link file */
   protected function removeLinkFile () {
 
@@ -190,7 +187,7 @@ abstract class BaseLock {
     if ( $file !== null ) {
 
       if ( unlink($file) === FALSE ) {
-        // FIXME: Should print a warning
+        syslog(LOG_WARNING, "unlink() failed for lock file: " . $file);
       }
 
       $this->clearLinkFileName();
