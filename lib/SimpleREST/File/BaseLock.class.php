@@ -124,7 +124,7 @@ abstract class BaseLock {
 
     $this->locked = true;
 
-    $this->postLockFileHandle();
+    $this->postLockFileHandle( $operation );
 
   }
 
@@ -174,7 +174,7 @@ abstract class BaseLock {
   }
 
   /** Called after flock() is called successfully */
-  abstract protected function postLockFileHandle ();
+  abstract protected function postLockFileHandle ($operation);
 
   /** Release lock if it is locked */
   abstract public function release ();

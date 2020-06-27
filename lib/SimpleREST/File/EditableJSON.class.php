@@ -22,7 +22,6 @@ class EditableJSON extends JSON {
 
     parent::__construct( $file );
 
-
   }
 
   public function __destruct () {

@@ -33,7 +33,7 @@ class ReadLock extends BaseLock {
   }
 
   /** Truncates the file handle and writes our PID in it */
-  protected function postLockFileHandle () {
+  protected function postLockFileHandle ( $operation ) {
 
     // We must clear cache for lockFileExists() and isSameLockFile()
     clearstatcache();
