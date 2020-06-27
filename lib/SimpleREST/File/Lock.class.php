@@ -79,7 +79,7 @@ class Lock {
 
       $this->closeFileHandle();
 
-      throw new Exception('Could not get a lock for ' . $file);
+      throw new Exception('Could not get a lock for ' . $this->file);
 
     }
 
