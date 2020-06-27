@@ -24,7 +24,7 @@ class JSON implements \JsonSerializable {
 
     $this->file = $file;
 
-    $this->lock = $use_lock === true ? new Lock( $file . ".lock" ) : null;
+    $this->lock = $use_lock === true ? new WriteLock( $file . ".lock" ) : null;
 
     $this->data = file_exists($file) ? json_decode(file_get_contents($file), true) : array();
 
@@ -39,23 +39,32 @@ class JSON implements \JsonSerializable {
   }
 
   public function __isset ($property) {
+
     return isset($this->data[$property]);
+
   }
 
   public function __unset ($property) {
+
     $this->changed = true;
     unset($this->data[$property]);
+
   }
 
   public function __get ($property) {
+
     if ( isset($this->data[$property]) ) {
       return $this->data[$property];
     }
+
   }
 
   public function __set ($property, $value) {
+
     $this->changed = true;
+
     $this->data[$property] = $value;
+
   }
 
   public function __destruct () {
@@ -71,11 +80,15 @@ class JSON implements \JsonSerializable {
   }
 
   public function __toString () {
+
     return json_encode($this->data);
+
   }
 
   public function jsonSerialize () {
+
     return $this->data;
+
   }
 
 }

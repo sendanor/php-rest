@@ -11,4 +11,6 @@ if(!defined('REST_PHP')) {
 }
 
 require_once( dirname(__FILE__) . '/JSON.class.php' );
-require_once( dirname(__FILE__) . '/Lock.class.php' );
+require_once( dirname(__FILE__) . '/BaseLock.class.php' );
+require_once( dirname(__FILE__) . '/WriteLock.class.php' );
+require_once( dirname(__FILE__) . '/ReadLock.class.php' );
