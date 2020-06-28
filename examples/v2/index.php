@@ -2,10 +2,10 @@
 
 define('DATA_FILE', dirname(__FILE__) . "/data.json");
 
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/index.php' );
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/index.php' );
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/Syslog/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/Syslog/index.php' );
 
 use SimpleREST\File\JSON as JSON;
 use SimpleREST\File\EditableJSON as EditableJSON;
