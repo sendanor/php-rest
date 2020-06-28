@@ -4,10 +4,10 @@
  * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
  */
 
-namespace SimpleREST\Framework\Database\MySQL;
+namespace SimpleREST\Legacy\Database\MySQL;
 
-use \SimpleREST\Framework\Database\iDatabase as iDatabase;
-use \SimpleREST\Framework\Database\iDatabaseTable as iDatabaseTable;
+use \SimpleREST\Legacy\Database\iDatabase as iDatabase;
+use \SimpleREST\Legacy\Database\iDatabaseTable as iDatabaseTable;
 use Exception;
 
 /* Security check */

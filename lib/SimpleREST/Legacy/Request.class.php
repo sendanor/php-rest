@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi> 
  */
 
-namespace SimpleREST\Framework;
+namespace SimpleREST\Legacy;
 
 use \SimpleREST\Request as SimpleRequest;
 

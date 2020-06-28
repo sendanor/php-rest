@@ -4,9 +4,9 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi> 
  */
 
-namespace SimpleREST\Framework;
+namespace SimpleREST\Legacy;
 
-use \SimpleREST\Framework\Database\iDatabase as iDatabase;
+use \SimpleREST\Legacy\Database\iDatabase as iDatabase;
 use Exception;
 
 /* Security check */

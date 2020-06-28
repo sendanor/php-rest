@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi> 
  */
 
-namespace SimpleREST\Framework\Database\MySQL;
+namespace SimpleREST\Legacy\Database\MySQL;
 
 use Exception;
 
@@ -14,7 +14,7 @@ if(!defined('REST_PHP')) {
 }
 
 /** Interface for database tables */
-class DatabaseTable implements SimpleREST\Framework\Database\iDatabaseTable {
+class DatabaseTable implements SimpleREST\Legacy\Database\iDatabaseTable {
 
 	private $db = NULL;
 	private $name = NULL;
@@ -36,13 +36,13 @@ class DatabaseTable implements SimpleREST\Framework\Database\iDatabaseTable {
 	protected $delete_byid_format  = 'DELETE FROM `%s` WHERE `%s` = "%s" LIMIT 1';
 
 	/** Construct an interface for database table */
-	public function __construct (SimpleREST\Framework\Database\iDatabase $db, $name) {
+	public function __construct (SimpleREST\Legacy\Database\iDatabase $db, $name) {
 		$this->db = $db;
 		$this->name = $name;
 	}
 
 	/** Set database interface */
-	public function setDatabase (SimpleREST\Framework\Database\iDatabase $db) {
+	public function setDatabase (SimpleREST\Legacy\Database\iDatabase $db) {
 		$this->db = $db;
 		return $this;
 	}

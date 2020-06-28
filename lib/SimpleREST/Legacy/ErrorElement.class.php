@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleREST\Framework;
+namespace SimpleREST\Legacy;
 
 use Exception;
 

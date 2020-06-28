@@ -4,7 +4,7 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
 
-namespace SimpleREST\Framework;
+namespace SimpleREST\Legacy;
 
 use Exception;
 
@@ -22,13 +22,13 @@ class ResponseWriter implements iResponseWriter {
 	protected $headers = NULL;
 
 	/** The default response type */
-	protected $default_type = 'SimpleREST\Framework\JSONResponse';
+	protected $default_type = 'SimpleREST\Legacy\JSONResponse';
 
 	/** Constructor */
 	function __construct () {
 		$this->headers = array();
 		ini_set('display_errors', 0);
-		ob_start('SimpleREST\Framework\fatal_error_handler');
+		ob_start('SimpleREST\Legacy\fatal_error_handler');
 	}
 
 	/** Set a default headers */

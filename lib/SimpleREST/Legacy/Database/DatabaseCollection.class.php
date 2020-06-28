@@ -4,10 +4,10 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
 
-namespace SimpleREST\Framework\Database;
+namespace SimpleREST\Legacy\Database;
 
-use \SimpleREST\Framework\iRequest as iRequest;
-use \SimpleREST\Framework\iCollection as iCollection;
+use \SimpleREST\Legacy\iRequest as iRequest;
+use \SimpleREST\Legacy\iCollection as iCollection;
 
 /* Security check */
 if(!defined('REST_PHP')) {

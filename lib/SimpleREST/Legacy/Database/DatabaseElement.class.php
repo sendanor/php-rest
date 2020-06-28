@@ -4,9 +4,9 @@
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
 
-namespace SimpleREST\Framework\Database;
+namespace SimpleREST\Legacy\Database;
 
-use \SimpleREST\Framework\iElement as iElement;
+use \SimpleREST\Legacy\iElement as iElement;
 
 /* Security check */
 if(!defined('REST_PHP')) {
