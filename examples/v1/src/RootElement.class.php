@@ -5,8 +5,8 @@ if (!defined('RESTExample')) {
 	die("Direct access not permitted\n");
 }
 
-use REST\Element;
-use REST\iRequest;
+use SimpleREST\Legacy\Element;
+use SimpleREST\Legacy\iRequest;
 
 /** The root resource for this REST service */
 class RootElement extends Element {

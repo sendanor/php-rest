@@ -6,7 +6,7 @@ if (!defined('RESTExample')) {
 }
 
 /** Contact collection */
-class ContactCollection extends REST\DatabaseCollection {
+class ContactCollection extends SimpleREST\Legacy\Database\DatabaseCollection {
 
 	/** */
 	public function __construct() {

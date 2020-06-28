@@ -7,41 +7,41 @@ define('RESTExample', TRUE);
 require('config.php');
 
 // Import our core framework
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Framework/index.php');
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Legacy/index.php');
 
 // Enable database support
-require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Framework/Database/index.php');
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Legacy/Database/index.php');
 
 // Add our own path to REST autoloader
-\REST\addAutoloadPath(dirname(__FILE__) . '/src');
+\SimpleREST\Legacy\addAutoloadPath(dirname(__FILE__) . '/src');
 
 // Enable autoloader
 function __autoload ($className) {
-	return REST\Autoloader::load($className);
+	return \SimpleREST\Legacy\Autoloader::load($className);
 }
 
 // Setup default MySQL database connection
 if (!defined('REST_TABLE_PREFIX')) {
     define('REST_TABLE_PREFIX', '');
 }
-$db = new REST\Database\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
+$db = new \SimpleREST\Legacy\Database\MySQL\Database(REST_HOSTNAME, REST_USERNAME, REST_PASSWORD, REST_DATABASE);
 $db->charset(REST_CHARSET);
 $db->setTablePrefix(REST_TABLE_PREFIX);
-\REST\Database\setDefaultDatabase($db);
+\SimpleREST\Legacy\Database\setDefaultDatabase($db);
 
 // Enable automatic support for OPTIONS
-\REST\enableAutoOptions();
+\SimpleREST\Legacy\enableAutoOptions();
 
 // Enable CORS
-\REST\setDefaultHeaders(array(
+\SimpleREST\Legacy\setDefaultHeaders(array(
 	'Access-Control-Allow-Origin' => '*'
 ));
 
 // Run current request
-\REST\run(array(
+\SimpleREST\Legacy\run(array(
 	"/" => "RootElement",
 	"/contact" => "ContactCollection",
 	"/contact/:contact_id" => "ContactElement",
-	"/error" => "REST\ErrorCollection",
-	"/error/:error_id" => "REST\ErrorElement"
+	"/error" => "\SimpleREST\Legacy\ErrorCollection",
+	"/error/:error_id" => "\SimpleREST\Legacy\ErrorElement"
 ));

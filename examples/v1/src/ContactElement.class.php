@@ -6,7 +6,7 @@ if (!defined('RESTExample')) {
 }
 
 /** Contact Element */
-class ContactElement extends REST\DatabaseElement {
+class ContactElement extends SimpleREST\Legacy\Database\Element {
 
 	/** */
 	public function __construct() {
