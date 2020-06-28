@@ -6,70 +6,114 @@
 
 namespace SimpleREST;
 
-use Exception;
-
 class Request {
 
-        private static $method = null;
-        private static $path = null;
-        private static $input = null;
+  /**
+   * @var string|null
+   */
+  private static $_method = null;
 
-	/** Returns current method name, all lowercase characters. */
+  /**
+   * @var string|null
+   */
+  private static $_path = null;
+
+  /**
+   * @var mixed|null
+   */
+  private static $_input = null;
+
+  /**
+   * @var bool
+   */
+  private static $_inputFetched = false;
+
+  /**
+   * Returns current method name, all lowercase characters.
+   *
+   * Defaults to "get".
+   *
+   * @return string
+   */
 	public static function getMethod () {
-		if (self::$method == null) {
-			self::$method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
+
+		if (self::$_method === null) {
+			self::$_method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
 		}
-		return self::$method;
+
+		return self::$_method;
+
 	}
 
-	/**
-	 */
+  /**
+   * Returns true if method is get.
+   *
+   * @return bool
+   */
 	public static function isMethodGet() {
 		return self::getMethod() === 'get';
 	}
 
-	/** Returns current request path */
+  /**
+   * Returns current request path.
+   *
+   * Defaults to "/".
+   *
+   * @return string
+   */
 	public static function getPath () {
 
-		if (self::$path == null) {
+		if (self::$_path == null) {
 
 			if ( isset($_SERVER['PATH_INFO']) && strlen($_SERVER['PATH_INFO']) >= 1 ) {
 
-				self::$path = $_SERVER['PATH_INFO'];
+				self::$_path = $_SERVER['PATH_INFO'];
 
 			} else if ( isset($_SERVER['ORIG_PATH_INFO']) ) {
 
-				self::$path = $_SERVER['ORIG_PATH_INFO'];
+				self::$_path = $_SERVER['ORIG_PATH_INFO'];
 
 			} else {
 
-				self::$path = "/";
+				self::$_path = "/";
 
 			}
 
 		}
 
-		return self::$path;
+		return self::$_path;
 
 	}
 
-	/** Returns current request query params */
+  /**
+   * Returns current request query params.
+   *
+   * @return array
+   */
 	public static function getQueryParams () {
 		return (array)$_GET;
 	}
 
-	/** Returns current request input as JSON */
+  /**
+   * Returns current request input as JSON
+   *
+   * @return array|mixed
+   */
 	public static function getInput () {
 
-		if ( self::$input == null ) {
+		if ( !self::$_inputFetched ) {
+
 			if ( self::isMethodGet() ) {
-				self::$input = array();
+				self::$_input = array();
 			} else {
-				self::$input = json_decode(file_get_contents('php://input'), true);
+				self::$_input = json_decode(file_get_contents('php://input'), true);
 			}
+
+      self::$_inputFetched = true;
+
 		}
 
-		return self::$input;
+		return self::$_input;
 
 	}
 

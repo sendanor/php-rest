@@ -1,7 +1,7 @@
 <?php
 /* 
  * Sendanor's PHP REST Framework
- * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
+ * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
 
 namespace SimpleREST;
@@ -12,24 +12,40 @@ class Response {
 
 	private static $statusCode = null;
 	private static $statusMessage = null;
-        private static $headers = null;
+  private static $headers = null;
 
-	/** Get JSON response */
+  /**
+   * Get JSON response
+   *
+   * @param $data mixed
+   * @return string
+   */
 	public static function getJSONResponse ($data) {
 
 		return json_encode($data);
 
 	}
 
+  /**
+   * @param $data mixed
+   * @throws Exception if headers have already been sent
+   */
 	public static function outputString ($data) {
 
-		self::outputHeaders();
-		self::outputStatus();
-		echo $data . "\n";
+		self::_outputHeaders();
+
+		self::_outputStatus();
+
+		echo "" . $data . "\n";
 
 	}
 
-	/** Write JSON response */
+  /**
+   * Write JSON response
+   *
+   * @param $data mixed
+   * @throws Exception if headers were already sent
+   */
 	public static function outputJSON ($data) {
 
 		self::setHeader('Content-Type', 'application/json');
@@ -53,7 +69,11 @@ class Response {
 		return HTTPStatusMessages::getMessage($code);
 	}
 
-	/** */
+  /**
+   * @param int $code
+   * @param string|null $message
+   * @throws Exception if headers sent
+   */
 	public static function setStatus ($code, $message = null) {
 
 		if ( self::isHeadersSent() ) {
@@ -64,7 +84,7 @@ class Response {
 			throw new Exception('Headers already set!');
 		}
 
-		if (is_null($message)) {
+		if ( $message === null ) {
 			$message = self::getMessageForCode($code);
 		}
 
@@ -73,19 +93,32 @@ class Response {
 
 	}
 
-	/** Write response */
+  /**
+   * Write response
+   *
+   * @param $data mixed
+   * @throws Exception if headers already sent
+   */
 	public static function output ( $data ) {
 
 		if ( $data instanceof Exception ) {
-			return self::outputException( $data );
-		}
 
-		self::outputJSON($data);
+			self::outputException( $data );
+
+		} else {
+
+      self::outputJSON($data);
+
+    }
 
 	}
 
-	/** Output headers */
-	protected static function outputHeaders () {
+  /**
+   * Output headers
+   *
+   * @throws Exception is headers have been sent
+   */
+	protected static function _outputHeaders () {
 
 		if ( self::isHeadersSent() ) {
 			throw new Exception('Headers already sent!');
@@ -101,7 +134,10 @@ class Response {
 
 	}
 
-	protected static function outputStatus () {
+  /**
+   *
+   */
+	protected static function _outputStatus () {
 
 		$code = self::$statusCode == null ? 200 : self::$statusCode;
 		$message = self::$statusMessage == null ? HTTPStatusMessages::getMessage($code) : self::$statusMessage;
@@ -111,7 +147,11 @@ class Response {
 
 	}
 
-	/** */
+  /**
+   * Set multiple headers
+   *
+   * @param $headers array
+   */
 	public static function setHeaders ($headers) {
 
 		if ( self::$headers == null ) {
@@ -124,7 +164,12 @@ class Response {
 
 	}
 
-	/** Get header */
+  /**
+   * Get single header
+   *
+   * @param $key string
+   * @return mixed|null
+   */
 	public static function getHeader ($key) {
 
 		if ( self::$headers == null ) {
@@ -135,23 +180,36 @@ class Response {
 
 	}
 
-	/** */
+  /**
+   * Set single header
+   *
+   * @param $key string
+   * @param $value string
+   */
 	public static function setHeader ($key, $value) {
 
-		if ( self::$headers == null ) {
+		if ( self::$headers === null ) {
+
 			$obj = array();
 			$obj[$key] = $value;
 			self::$headers = $obj;
+
 		} else {
+
 			self::$headers[$key] = $value;
+
 		}
 
 	}
 
-	/** */
+  /**
+   * @param int $code
+   * @param string|null $message
+   * @return array
+   */
 	public static function getErrorResponse ($code, $message = null) {
 
-		if (is_null($message)) {
+		if ($message === null) {
 			$message = self::getMessageForCode($code);
 		}
 
@@ -162,7 +220,10 @@ class Response {
 
 	}
 
-	/** */
+  /**
+   * @param Exception $e
+   * @return array
+   */
 	public static function getExceptionResponse (Exception $e) {
 
 		if ($e instanceof HTTPError) {
@@ -173,21 +234,36 @@ class Response {
 
 	}
 
-	/** */
-	public static function outputError ($code, $message = null) {
-
-		$response = self::getErrorResponse($code, $message);
+  /**
+   * @param array $response
+   * @throws Exception if headers already sent
+   */
+	public static function outputErrorResponse ($response) {
 
 		self::setStatus($response['code'], $response['error']);
 
-		return self::output( $response );
+		self::output( $response );
 
 	}
 
-	/** */
+  /**
+   * @param int $code
+   * @param string|null $message
+   * @throws Exception if headers already sent
+   */
+	public static function outputError ($code, $message = null) {
+
+		self::outputErrorResponse( self::getErrorResponse($code, $message) );
+
+	}
+
+  /**
+   * @param Exception $e
+   * @throws Exception if headers already sent
+   */
 	public static function outputException (Exception $e) {
 
-		self::outputError( self::getExceptionResponse($e) );
+    self::outputErrorResponse( self::getExceptionResponse($e) );
 
 	}
 

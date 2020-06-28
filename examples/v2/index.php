@@ -1,13 +1,11 @@
 <?php
 
-// Import our core library
+define('DATA_FILE', dirname(__FILE__) . "/data.json");
+
 require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/index.php' );
-
-// Import our JSON file library
 require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
-
-use SimpleREST\Logger\Syslog as Logger;
-$logger = new Logger("myScriptLog");
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/index.php' );
+require( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Log/Syslog/index.php' );
 
 use SimpleREST\File\JSON as JSON;
 use SimpleREST\File\EditableJSON as EditableJSON;
@@ -15,12 +13,12 @@ use SimpleREST\File\EditableJSON as EditableJSON;
 use SimpleREST\Request as Request;
 use SimpleREST\Response as Response;
 
-define('DATA_FILE', dirname(__FILE__) . "/data.json");
+SimpleREST\Log\setLogger( new SimpleREST\Log\Syslog("myScriptLog") );
 
 $METHOD = Request::getMethod();
 $PATH   = Request::getPath();
 
-$logger->info("Request '$METHOD' '$PATH'");
+SimpleREST\Log\info("$METHOD $PATH: Request started");
 
 switch ( $PATH ) {
 
@@ -34,6 +32,9 @@ case "/hello":
     $DATA = new EditableJSON( DATA_FILE );
     $DATA->hello = Request::getInput();
     Response::outputJSON( $DATA->hello );
+
+    SimpleREST\Log\info("$METHOD $PATH: Changed hello property as '" . $DATA->hello . "'");
+
     break;
 
   # GET|HEAD /hello
@@ -59,8 +60,9 @@ case "/":
   # PUT /
   case "put":
     $DATA = new EditableJSON( DATA_FILE );
-    $DATA->setInternal( Request::getInput() );
+    $DATA->setValue( Request::getInput() );
     Response::output( $DATA );
+    SimpleREST\Log\info("$METHOD $PATH: Changed resource completely");
     break;
 
   # GET /

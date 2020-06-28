@@ -10,6 +10,7 @@ if(!defined('REST_PHP')) {
 	define('REST_PHP', TRUE);
 }
 
-require_once( dirname(__FILE__) . '/Lock/index.php' );
-require_once( dirname(__FILE__) . '/Text/index.php' );
-require_once( dirname(__FILE__) . '/JSON/index.php' );
+require_once( dirname(__FILE__) . '/BaseLock.class.php' );
+require_once( dirname(__FILE__) . '/ReadLock.class.php' );
+require_once( dirname(__FILE__) . '/WriteLock.class.php' );
+
