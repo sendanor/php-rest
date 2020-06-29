@@ -24,28 +24,49 @@ class Syslog extends BaseLogger {
   }
 
   /**
-   * @param string $msg
+   * @param int $level The log level for syslog()
+   * @param string[] $values Log message values to print
    */
-  public function error ($msg) {
+  protected function _write ($level, array $values) {
 
-    syslog(LOG_ERR, $msg);
+    syslog($level, stringifyValues($values));
 
   }
 
   /**
-   * @param string $msg
+   * @param string[] $msg
    */
-  public function info ($msg) {
+  public function error (...$msg) {
 
-    syslog(LOG_INFO, $msg);
+    $this->_write(LOG_ERR, $msg);
 
   }
 
   /**
-   * @param string $msg
+   * @param string[] $msg
    */
-  public function warning ( $msg ) {
-    syslog(LOG_WARNING, $msg);
+  public function info (...$msg) {
+
+    $this->_write(LOG_INFO, $msg);
+
+  }
+
+  /**
+   * @param string[] $msg
+   */
+  public function debug (...$msg) {
+
+    $this->_write(LOG_DEBUG, $msg);
+
+  }
+
+  /**
+   * @param string[] $msg
+   */
+  public function warning ( ...$msg ) {
+
+    $this->_write(LOG_WARNING, $msg);
+
   }
 
 }

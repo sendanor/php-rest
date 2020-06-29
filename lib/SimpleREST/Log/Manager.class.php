@@ -6,6 +6,9 @@
 
 namespace SimpleREST\Log;
 
+use Exception;
+use TypeError;
+
 /**
  * Class Logger
  * @package SimpleREST\Log
@@ -35,6 +38,16 @@ abstract class Manager {
 
     return self::$logger;
 
+  }
+
+  /**
+   * @param string $name
+   * @return BaseLogger|ErrorLog|Syslog
+   * @throws Exception if $name is not a string
+   * @throws TypeError if REST_LOGGER is defined and is not correct logger name
+   */
+  public static function createDefaultLogger ($name) {
+    return createLogger( defined('REST_LOGGER') ? REST_LOGGER : 'stderr', $name);
   }
 
 }

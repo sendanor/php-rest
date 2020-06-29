@@ -6,6 +6,9 @@
 
 namespace SimpleREST\Log;
 
+use Exception;
+use TypeError;
+
 /**
  * Logger which logs to process standard error
  *
@@ -14,33 +17,74 @@ namespace SimpleREST\Log;
 class ErrorLog extends BaseLogger {
 
   /**
-   * @param $msg string
+   * @var false|resource|null
    */
-  protected static function _write ($level, $msg) {
+  protected static $STDERR = null;
 
-    fwrite(STDERR, '[' . $level . '] ' . $msg );
+  /**
+   * @var string|null
+   */
+  protected $_name = null;
+
+  /**
+   * Standard error logger constructor.
+   *
+   * @param string $name The name for logger
+   * @throws Exception if cannot open standard error
+   * @throws TypeError if $name is not a string
+   */
+  public function __construct ($name) {
+
+    if (!is_string($name)) {
+      throw new TypeError('Option was not string');
+    }
+
+    if ( self::$STDERR === null ) {
+      $fp = fopen('php://stderr', 'w');
+      if ($fp === FALSE) throw new Exception('Could not open STDERR for logging!');
+      self::$STDERR = $fp;
+    }
+
+    $this->_name = $name;
 
   }
 
   /**
-   * @param string $msg
+   * @param $level string
+   * @param $values string[]
    */
-  public function error ($msg) {
-    self::_write('ERROR', $msg );
+  protected function _write ($level, array $values) {
+
+    fwrite(self::$STDERR, '[' . $this->_name. '] [' . $level . '] ' . stringifyValues($values) . "\n" );
+
   }
 
   /**
-   * @param string $msg
+   * @param mixed[] $msg
    */
-  public function info ($msg) {
-    self::_write('INFO', $msg );
+  public function error (...$msg) {
+    $this->_write('ERROR', $msg );
   }
 
   /**
-   * @param string $msg
+   * @param mixed[] $msg
    */
-  public function warning ( $msg ) {
-    self::_write('WARN', $msg );
+  public function info (...$msg) {
+    $this->_write('INFO', $msg );
+  }
+
+  /**
+   * @param mixed[] $msg
+   */
+  public function warning ( ...$msg ) {
+    $this->_write('WARN', $msg );
+  }
+
+  /**
+   * @param mixed[] $msg
+   */
+  public function debug ( ...$msg ) {
+    $this->_write('DEBUG', $msg );
   }
 
 }

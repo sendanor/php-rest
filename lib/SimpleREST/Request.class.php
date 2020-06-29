@@ -12,6 +12,11 @@ use TypeError;
 class Request {
 
   /**
+   * @var bool
+   */
+  private static $_started = false;
+
+  /**
    * @var string|null
    */
   private static $_method = null;
@@ -121,30 +126,124 @@ class Request {
 	}
 
   /**
-   * @param string|array $methods Method name as string, or "*" for any, or an array of method names. Must be lowercase.
-   * @param string $path
-   * @return bool
+   * @param string $search
+   * @return string
+   * @throws TypeError if $search is invalid or empty string
    */
-	public static function isMatch ( $methods, $path ) {
+	public static function normalizeMatchFormat ($search) {
 
-	  if (Request::getPath() !== $path) {
-	    return false;
+	  if (!is_string($search)) throw new TypeError('argument was not a string');
+
+    $search = trim($search);
+
+    if ( strlen($search) === 0 )  throw new TypeError('argument was empty string');
+    if ( $search === "*" )        return "* /*";
+    if ( $search === "?" )        return "? /*";
+    if ( $search[0] === '/' )     return '* ' . $search;
+
+    if ( strpos($search,'/') === FALSE ) {
+      return $search . ' /*';
     }
 
-    if ($methods === "*") return true;
+    return $search;
 
-    $request_method = Request::getMethod();
+  }
 
-	  if ( $methods === $request_method ) return true;
+  /**
+   * @param string|array $search Method name as string, or "*" for any, or an array of method names. Must be lowercase.
+   * @return bool|array
+   * @fixme Implement unit testing
+   */
+	public static function isMatch ( $search ) {
 
-	  if (!is_array($methods)) return false;
-
-    foreach ($methods as $method) {
-      if( $method === "*") return true;
-      if( $method === $request_method ) return true;
+    // Parse arrays
+    if ( is_array($search) ) {
+      foreach ($search as $opt) {
+        $params = self::isMatch($opt);
+        if ( $params !== FALSE ) {
+          return $params;
+        }
+      }
+      return FALSE;
     }
 
-    return false;
+    // Invalidate non-strings
+    if ( !is_string($search) ) {
+      throw new TypeError('Match option was invalid: ' . var_export($search, true) );
+    }
+
+    $search = self::_splitPath(self::normalizeMatchFormat($search));
+
+    if ( $search === "* /*" ) return TRUE;
+
+    $current = self::_splitPath( Request::getMethod() . ' ' . Request::getPath() );
+
+    $obj = array();
+    $params = array();
+    $i = -1;
+
+    //Log\debug('START SEARCH =', $search, 'CURRENT =', $current);
+
+    if (count($current) > count($search) && end($search) !== '*') {
+      return FALSE;
+    }
+
+    foreach($search as $format) {
+
+      ++$i;
+
+      $item = isset($current[$i]) ? $current[$i] : null;
+
+      //Log\debug($i,'FORMAT =', $format);
+      //Log\debug($i,'ITEM =', $item);
+
+      if ( $format === '*' ) {
+        //Log\debug($i,'Wildcard, next.');
+        continue;
+      }
+
+      if ( $item === null ) {
+        //Log\debug($i,'ITEM is NULL, fail.');
+        return FALSE;
+      }
+
+      if ( $format === '?' ) {
+        //Log\debug($i,'Variable (unnamed), next.');
+        array_push($params, $item);
+        continue;
+      }
+
+      if ( $format !== '' && $format[0] === ':' ) {
+        $key = substr($format, 1);
+        //Log\debug($i,"Variable (named: '$key'), next.");
+        $obj[$key] = $item;
+        continue;
+      }
+
+      if ( $format !== $item ) {
+        //Log\debug($i,"FORMAT !== ITEM, fail.");
+        return FALSE;
+      }
+
+      //Log\debug($i,"FORMAT === ITEM, next.");
+
+    }
+
+    if ( count($obj) !== 0 ) {
+      array_push($params, $obj);
+    }
+
+    //Log\debug("Everything OK, success.");
+    return count($params) !== 0 ? $params : TRUE;
+
+  }
+
+  private static function _splitPath ($value) {
+
+	  return array_map(function($item) {
+	    $item = trim($item);
+      return $item;
+    }, explode('/', $value));
 
   }
 
@@ -169,55 +268,47 @@ class Request {
    *   ["get", "head"]            - GET or HEAD method for any path
    *   ["get /foo", "head /foo"]  - GET or HEAD method for path /foo
    *
+   * If you mix "?" placeholders and ":key" variables, the last option in the callback will have the object with properties.
+   *
    * @param string|array|null $search The match option
    * @param callable $f Calls the function with optional parameters from the matched path.
    * @throws TypeError if match option is invalid
    */
 	public static function match ( $search, callable $f ) {
 
-	  // Parse arrays
-	  if ( is_array($search) ) {
-	    foreach ($search as $opt) {
-	      self::match($opt, $f);
-      }
-	    return;
-    }
+    //Log\debug("SEARCH =", $search);
 
-	  // Invalidate non-strings
-	  if ( !is_string($search) ) {
-	    throw new TypeError('Match option was invalid: ' . var_export($search, true) );
-    }
+	  $params = self::isMatch($search);
 
-	  $search = trim($search);
+    //Log\debug("RESULT =", $params);
 
-    if ( $search === "*" ) {
+    if ($params === TRUE) {
       self::run($f);
-      return;
+    } else if ( $params !== FALSE ) {
+      self::run($f, ...$params);
     }
-
-	  if ($search[0] === '/') {
-	    $search = '*' . $search;
-    }
-
-	  if ( strpos($search,'/') === FALSE ) {
-	    $search = $search . '/*';
-    }
-
-    $current = Request::getMethod() . '/' . Request::getPath();
-
-	  SimpleREST\Log\info('search: ', var_export($search, true));
-	  SimpleREST\Log\info('current: ', var_export($current, true));
 
   }
 
   /**
-   * @param $f callable
+   * Run a request with optional params to the callback.
+   *
+   * @param callable $f The function to call
+   * @param mixed[] $params Optional params to the $f
    */
-	public static function run ($f) {
+	public static function run ($f, ...$params) {
 
 	  try {
 
-	    $response = $f();
+	    if (!self::$_started) {
+	      self::start( self::getDefaultName() );
+      }
+
+      if (Response::isSent()) {
+        throw new Exception('Response was already sent.');
+      }
+
+      $response = $f(...$params);
 
       if (!Response::isSent()) {
         Response::output($response);
@@ -242,5 +333,111 @@ class Request {
     }
 
   }
+
+  /**
+   * Initialize default request handlers
+   *
+   * @param string $name The application name for logging
+   * @throws Exception if already started
+   */
+  public static function start ($name) {
+
+    if (self::$_started === true) {
+      throw new Exception('Cannot start request again.');
+    }
+
+    self::$_started = true;
+
+    Log\setLogger( Log\Manager::createDefaultLogger($name) );
+
+    Log\debug("Request started in development mode.");
+
+    self::enableShutdownHandler();
+
+    Log\debug("Request initialized.");
+
+  }
+
+  /**
+   * Enable shutdown handler.
+   *
+   * See also `Request::start()`
+   */
+  public static function enableShutdownHandler () {
+	  register_shutdown_function('\SimpleREST\Request::onShutdown');
+  }
+
+  /**
+   * @return bool
+   */
+  public static function isProduction () {
+    return defined('REST_PRODUCTION') && REST_PRODUCTION === true;
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDefaultName () {
+    return defined('REST_NAME') ? REST_NAME : 'unnamed';
+  }
+
+  /**
+   * Shutdown function to catch fatal errors and output them as JSON.
+   *
+   * See `Request::enableShutdownHandler()`
+   *
+   * @return false|string
+   */
+  public static function onShutdown () {
+
+    Log\debug("Shutdown handler called.");
+
+    // Handle (fatal) PHP errors
+    $error = error_get_last();
+    if ( $error !== null ) {
+
+      Log\error("PHP Error: " . $error['message'] . ' at ' . $error['file'] . ':' . $error['line']);
+
+      if (Response::isHeadersSent()) {
+        Log\warning("Warning! Headers were already sent!");
+        return;
+      }
+
+      try {
+
+        Response::setStatus(500, "Backend Error");
+
+        Response::setHeader('Content-Type', 'application/json');
+
+        if (self::isProduction()) {
+
+          Response::output(array(
+            'error' => 'Backend Error',
+            'code' => 500
+          ));
+
+        } else {
+
+          Response::output(array(
+            'error' => 'Backend Error',
+            'code' => 500,
+            'file' => $error['file'],
+            'line' => $error['line'],
+            'message' => $error['message']
+          ));
+          exit(1);
+
+        }
+
+      } catch (Exception $e) {
+
+          Log\error("Exception while preparing the response for previous fatal error: " . $e);
+
+      }
+
+    }
+
+  }
+
 
 }

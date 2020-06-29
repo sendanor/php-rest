@@ -13,16 +13,20 @@ namespace SimpleREST\Log;
  */
 class Log {
 
-  public static function error ($msg) {
-    error($msg);
+  public static function error (...$msg) {
+    error(...$msg);
   }
 
-  public static function warning ($msg) {
-    warning($msg);
+  public static function warning (...$msg) {
+    warning(...$msg);
   }
 
-  public static function info ($msg) {
-    info($msg);
+  public static function info (...$msg) {
+    info(...$msg);
+  }
+
+  public static function debug (...$msg) {
+    debug(...$msg);
   }
 
   public static function setLogger ($logger) {
