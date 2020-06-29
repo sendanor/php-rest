@@ -337,7 +337,7 @@ class Request {
         return !is_null($item);
       });
 
-      Log\debug('METHOD COMMENT = ', $search );
+      //Log\debug('METHOD COMMENT = ', $search );
 
       if ($method->IsStatic()) {
 
