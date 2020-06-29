@@ -8,7 +8,7 @@ namespace SimpleREST\Log;
 
 /**
  * Class Logger
- * @package SimpleREST\Logger
+ * @package SimpleREST\Log
  */
 abstract class Manager {
 

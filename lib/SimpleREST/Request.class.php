@@ -7,6 +7,7 @@
 namespace SimpleREST;
 
 use Exception;
+use TypeError;
 
 class Request {
 
@@ -148,15 +149,64 @@ class Request {
   }
 
   /**
-   * @param string|array $methods
-   * @param string $path
-   * @param callable $f
+   * Match path and/or methods with optional parameters.
+   *
+   * If a match is made, will execute `Request::run($f[, $opt(s)])`, which will also terminate the process.
+   *
+   * Eg. if this function ever returns, no matches were made.
+   *
+   * Examples for match option:
+   *
+   *   "*"                        - Any method or path
+   *   "?"                        - Any method or path and place the method in the first argument to $f
+   *   ":method"                  - Any method or path and place the method in the property named "method" for $f
+   *   "/foo"                     - Any method for path /foo
+   *   "/foo/*"                   - Any method for path /foo/*
+   *   "/foo/:variable"           - Any method for path /foo/* and place the wildcard value in property named "variable"
+   *   "/foo/?"                   - Any method for path /foo/* and place the wildcard value in first argument to $f
+   *   "put"                      - PUT method for any path
+   *   "get /foo"                 - GET method for path /foo
+   *   ["get", "head"]            - GET or HEAD method for any path
+   *   ["get /foo", "head /foo"]  - GET or HEAD method for path /foo
+   *
+   * @param string|array|null $search The match option
+   * @param callable $f Calls the function with optional parameters from the matched path.
+   * @throws TypeError if match option is invalid
    */
-	public static function match ( $methods, $path, callable $f ) {
+	public static function match ( $search, callable $f ) {
 
-	  if ( self::isMatch($methods, $path) ) {
-	    self::run($f);
+	  // Parse arrays
+	  if ( is_array($search) ) {
+	    foreach ($search as $opt) {
+	      self::match($opt, $f);
+      }
+	    return;
     }
+
+	  // Invalidate non-strings
+	  if ( !is_string($search) ) {
+	    throw new TypeError('Match option was invalid: ' . var_export($search, true) );
+    }
+
+	  $search = trim($search);
+
+    if ( $search === "*" ) {
+      self::run($f);
+      return;
+    }
+
+	  if ($search[0] === '/') {
+	    $search = '*' . $search;
+    }
+
+	  if ( strpos($search,'/') === FALSE ) {
+	    $search = $search . '/*';
+    }
+
+    $current = Request::getMethod() . '/' . Request::getPath();
+
+	  SimpleREST\Log\info('search: ', var_export($search, true));
+	  SimpleREST\Log\info('current: ', var_export($current, true));
 
   }
 

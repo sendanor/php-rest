@@ -17,3 +17,5 @@ require_once( dirname(__FILE__) . '/ErrorLog/index.php' );
 require_once( dirname(__FILE__) . '/Manager.class.php' );
 
 require_once( dirname(__FILE__) . '/functions.php' );
+
+require_once( dirname(__FILE__) . '/Log.class.php' );

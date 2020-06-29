@@ -21,35 +21,37 @@ Request::run(function () {
   $PATH = Request::getPath();
   SimpleREST\Log\info("$METHOD $PATH: Request started");
 
-  # PUT /hello
-  Request::match("put", "/hello", function () use ($METHOD, $PATH) {
+  # /hello
+  Request::match("/hello", function () use ($METHOD, $PATH) {
 
-    $METHOD = Request::getMethod();
-    $PATH = Request::getPath();
+    # PUT /hello
+    Request::match("put", function() use ($METHOD, $PATH) {
 
-    $DATA = new EditableJSON( DATA_FILE );
+      $DATA = new EditableJSON( DATA_FILE );
 
-    $DATA->hello = Request::getInput();
+      /** @noinspection PhpUndefinedFieldInspection */
+      $DATA->hello = Request::getInput();
 
-    SimpleREST\Log\info("$METHOD $PATH: Changed hello property as '" . $DATA->hello . "'");
+      SimpleREST\Log\info("$METHOD $PATH: Changed hello property as '" . $DATA->hello . "'");
 
-    return $DATA->hello;
+      return $DATA->hello;
 
-  });
+    });
 
-  # GET|HEAD /hello
-  Request::match(["get", "head"], "/hello", function() {
+    # GET|HEAD /hello
+    Request::match(["get", "head"], function() {
 
-    $DATA = new JSON( DATA_FILE );
+      $DATA = new JSON( DATA_FILE );
 
-    return isset($DATA->hello) ? $DATA->hello : null;
+      return isset($DATA->hello) ? $DATA->hello : null;
 
-  });
+    });
 
-  # Other for /hello
-  Request::match("*", "/hello", function() {
+    # Other for /hello
     Response::outputError(405);
+
   });
+
 
   # PUT /
   Request::match("put", "/", function () use ($METHOD, $PATH) {

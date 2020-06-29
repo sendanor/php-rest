@@ -15,6 +15,9 @@ class Response {
   private static $headers = null;
   private static $output_sent = false;
 
+  /**
+   * @return bool
+   */
   public static function isSent () {
     return self::$output_sent;
   }
