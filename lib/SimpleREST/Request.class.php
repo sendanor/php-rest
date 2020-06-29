@@ -8,6 +8,12 @@ namespace SimpleREST;
 
 use Exception;
 use TypeError;
+use Throwable;
+use ReflectionClass;
+
+if (!defined('REST_DOC_COMMENT')) {
+  define('REST_DOC_COMMENT', '@request');
+}
 
 class Request {
 
@@ -293,7 +299,7 @@ class Request {
   /**
    * Run a request with optional params to the callback.
    *
-   * @param callable $f The function to call
+   * @param callable|string $f The function to call or a class name
    * @param mixed[] $params Optional params to the $f
    */
 	public static function run ($f, ...$params) {
@@ -306,6 +312,63 @@ class Request {
 
       if (Response::isSent()) {
         throw new Exception('Response was already sent.');
+      }
+
+      if ( is_string($f) && class_exists($f, TRUE) ) {
+
+        $reflection = new ReflectionClass($f);
+
+        $methods = $reflection->getMethods();
+
+        foreach($methods as $method) {
+
+          $search = array_filter(array_map(
+
+            function($row) {
+
+              $i = strpos($row, REST_DOC_COMMENT);
+
+              if ($i === FALSE) return NULL;
+
+              return trim(substr($row, $i + strlen(REST_DOC_COMMENT) ));
+
+            },
+
+            explode("\n", $method->getDocComment())
+          ), function ($item) {
+            return !is_null($item);
+          });
+
+          Log\debug('METHOD COMMENT = ', $search );
+
+          $obj = null;
+          $cb = null;
+
+          if ($method->IsStatic()) {
+
+            $cb = function(...$args) use(&$method) {
+              return $method->invokeArgs(null, $args);
+            };
+
+          } else {
+
+            if ($obj === null) $obj = new $f();
+
+            $cb = function(...$args) use(&$method, &$obj) {
+              return $method->invokeArgs($obj, $args);
+            };
+
+          }
+
+          Request::match($search, $cb);
+
+        }
+
+        return;
+      }
+
+      if (!is_callable($f)) {
+        throw new TypeError('Argument is not callable: ' . var_export($f, true) );
       }
 
       $response = $f(...$params);
@@ -322,7 +385,21 @@ class Request {
 
       if (!Response::isSent()) {
         try {
-            Response::outputException($e);
+          Response::outputException($e);
+        } catch (Exception $e2) {
+          Log\error('Exception while printing previous exception: ' . $e2);
+        }
+      }
+
+      exit(1);
+
+    } catch (Throwable $e) {
+
+      Log\error('Error: ' . $e);
+
+      if (!Response::isSent()) {
+        try {
+          Response::outputException($e);
         } catch (Exception $e2) {
           Log\error('Exception while printing previous exception: ' . $e2);
         }
@@ -386,7 +463,6 @@ class Request {
    *
    * See `Request::enableShutdownHandler()`
    *
-   * @return false|string
    */
   public static function onShutdown () {
 

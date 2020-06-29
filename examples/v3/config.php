@@ -1,10 +1,10 @@
 <?php
 
 // If enabled, will not use development features
-define('REST_PRODUCTION', true);
+//define('REST_PRODUCTION', true);
 
 // Set logger (syslog or stderr)
-define('REST_LOGGER', 'syslog');
+define('REST_LOGGER', 'stderr');
 
 // The data for JSON file example
 define('REST_DATA_FILE', dirname(__FILE__) . "/data.json");

@@ -7,6 +7,7 @@
 namespace SimpleREST;
 
 use Exception;
+use Throwable;
 
 class Response {
 
@@ -231,10 +232,10 @@ class Response {
 	}
 
   /**
-   * @param Exception $e
+   * @param Throwable $e
    * @return array
    */
-	public static function getExceptionResponse (Exception $e) {
+	public static function getExceptionResponse (Throwable $e) {
 
 		if ($e instanceof HTTPError) {
 			return self::getErrorResponse( $e->getCode(), $e->getMessage() );
@@ -268,10 +269,10 @@ class Response {
 	}
 
   /**
-   * @param Exception $e
+   * @param Throwable $e
    * @throws Exception if headers already sent
    */
-	public static function outputException (Exception $e) {
+	public static function outputException (Throwable $e) {
 
     self::outputErrorResponse( self::getExceptionResponse($e) );
 
