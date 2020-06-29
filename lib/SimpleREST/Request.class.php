@@ -393,18 +393,25 @@ class Request {
       }
 
       if ( is_string($f) && class_exists($f, TRUE) ) {
+
         self::matchUsingReflectionClass($f);
-        return;
-      }
 
-      if (!is_callable($f)) {
-        throw new TypeError('Argument is not callable: ' . var_export($f, true) );
-      }
+        if (!Response::isSent()) {
+          Response::outputError(404);
+        }
 
-      $response = $f(...$params);
+      } else {
 
-      if (!Response::isSent()) {
-        Response::output($response);
+        if (!is_callable($f)) {
+          throw new TypeError('Argument is not callable: ' . var_export($f, true) );
+        }
+
+        $response = $f(...$params);
+
+        if (!Response::isSent()) {
+          Response::output($response);
+        }
+
       }
 
       exit(0);
