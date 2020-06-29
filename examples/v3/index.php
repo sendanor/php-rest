@@ -204,7 +204,6 @@ class MyAPI {
    * Any other path
    *
    * @throws Exception
-   * @request * *
    * @noinspection PhpUnused
    */
   static public function notFoundError () {
@@ -216,4 +215,10 @@ class MyAPI {
 
 }
 
-Request::run(MyAPI::class );
+Request::run( function () {
+
+  Request::match(MyAPI::class);
+
+  MyAPI::notFoundError();
+
+});

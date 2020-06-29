@@ -13,5 +13,5 @@ define('REST_DATA_FILE', dirname(__FILE__) . "/data.json");
 define('REST_DATABASE', 'phprestexample');
 define('REST_HOSTNAME', 'localhost');
 define('REST_USERNAME', 'phprestexample');
-define('REST_PASSWORD', 'SUPI1PiQ79HDpX');
+define('REST_PASSWORD', 'secret');
 define('REST_CHARSET', 'utf8');
