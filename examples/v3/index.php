@@ -91,6 +91,7 @@ class MyAPI {
   /**
    * @request /hello
    * @noinspection PhpUnused
+   * @throws Exception if headers already sent
    */
   static public function hello () {
 
@@ -111,6 +112,9 @@ class MyAPI {
    * @noinspection PhpUnused
    */
   static public function update () {
+
+    $METHOD = Request::getMethod();
+    $PATH = Request::getPath();
 
     Log::debug('--- Matched / with PUT method ---');
 
@@ -193,6 +197,7 @@ class MyAPI {
    *
    * @request * /
    * @noinspection PhpUnused
+   * @throws Exception if headers already sent
    */
   static public function methodNotFoundError () {
 
