@@ -282,7 +282,7 @@ class Request {
    * @param callable $f Calls the function with optional parameters from the matched path.
    * @throws TypeError if match option is invalid
    */
-	public static function match ( $search, callable $f ) {
+	public static function match ( $search, $f ) {
 
     //Log\debug("SEARCH =", $search);
 
@@ -300,9 +300,10 @@ class Request {
 
   /**
    * @param string $className
+   * @param array $params
    * @throws ReflectionException if the class does not exist
    */
-  public static function matchUsingReflectionClass ($className) {
+  public static function matchUsingReflectionClass ($className, $params) {
 
     $obj = null;
 
@@ -345,7 +346,7 @@ class Request {
 
       } else {
 
-        if ($obj === null) $obj = new $className();
+        if ($obj === null) $obj = new $className(...$params);
 
         $cb = self::_createCallbackFromReflectionMethod($method, $obj);
 
@@ -382,6 +383,10 @@ class Request {
 
   }
 
+  protected static function _isClass ($className) {
+    return is_string($className) && class_exists($className, TRUE);
+  }
+
   /**
    * Run a request with optional params to the callback.
    *
@@ -400,9 +405,9 @@ class Request {
         throw new Exception('Response was already sent.');
       }
 
-      if ( is_string($f) && class_exists($f, TRUE) ) {
+      if ( self::_isClass($f) ) {
 
-        self::matchUsingReflectionClass($f);
+        self::matchUsingReflectionClass($f, $params);
 
         if (!Response::isSent()) {
           Response::outputError(404);
