@@ -1,10 +1,12 @@
 <?php
 /* 
  * Sendanor's PHP REST Framework
- * Copyright 2017-2020 Jaakko-Heikki Heusala <jheusala@iki.fi>
+ * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
 
 namespace SimpleREST;
+
+use Exception;
 
 class Request {
 
@@ -116,5 +118,79 @@ class Request {
 		return self::$_input;
 
 	}
+
+  /**
+   * @param string|array $methods Method name as string, or "*" for any, or an array of method names. Must be lowercase.
+   * @param string $path
+   * @return bool
+   */
+	public static function isMatch ( $methods, $path ) {
+
+	  if (Request::getPath() !== $path) {
+	    return false;
+    }
+
+    if ($methods === "*") return true;
+
+    $request_method = Request::getMethod();
+
+	  if ( $methods === $request_method ) return true;
+
+	  if (!is_array($methods)) return false;
+
+    foreach ($methods as $method) {
+      if( $method === "*") return true;
+      if( $method === $request_method ) return true;
+    }
+
+    return false;
+
+  }
+
+  /**
+   * @param string|array $methods
+   * @param string $path
+   * @param callable $f
+   */
+	public static function match ( $methods, $path, callable $f ) {
+
+	  if ( self::isMatch($methods, $path) ) {
+	    self::run($f);
+    }
+
+  }
+
+  /**
+   * @param $f callable
+   */
+	public static function run ($f) {
+
+	  try {
+
+	    $response = $f();
+
+      if (!Response::isSent()) {
+        Response::output($response);
+      }
+
+      exit(0);
+
+    } catch (Exception $e) {
+
+      Log\error('Exception: ' . $e);
+
+      if (!Response::isSent()) {
+        try {
+            Response::outputException($e);
+        } catch (Exception $e2) {
+          Log\error('Exception while printing previous exception: ' . $e2);
+        }
+      }
+
+      exit(1);
+
+    }
+
+  }
 
 }

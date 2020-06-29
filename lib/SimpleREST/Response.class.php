@@ -13,6 +13,11 @@ class Response {
 	private static $statusCode = null;
 	private static $statusMessage = null;
   private static $headers = null;
+  private static $output_sent = false;
+
+  public static function isSent () {
+    return self::$output_sent;
+  }
 
   /**
    * Get JSON response
@@ -37,6 +42,8 @@ class Response {
 		self::_outputStatus();
 
 		echo "" . $data . "\n";
+
+    self::$output_sent = true;
 
 	}
 
