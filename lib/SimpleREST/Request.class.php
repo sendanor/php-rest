@@ -13,8 +13,8 @@ use Closure;
 use ReflectionClass;
 use ReflectionException;
 
-if (!defined('REST_DOC_COMMENT')) {
-  define('REST_DOC_COMMENT', '@request');
+if (!defined('REST_ROUTE_DOC_COMMENT')) {
+  define('REST_ROUTE_DOC_COMMENT', '@Route');
 }
 
 class Request {
@@ -304,23 +304,31 @@ class Request {
    */
   public static function matchUsingReflectionClass ($className) {
 
+    $obj = null;
+
     $reflection = new ReflectionClass($className);
 
     $methods = $reflection->getMethods();
 
-    $obj = null;
-
-    foreach($methods as $method) {
+    foreach($methods as &$method) {
 
       $search = array_filter(array_map(
 
         function($row) {
 
-          $i = strpos($row, REST_DOC_COMMENT);
+          $i = strpos($row, REST_ROUTE_DOC_COMMENT);
 
           if ($i === FALSE) return NULL;
 
-          return trim(substr($row, $i + strlen(REST_DOC_COMMENT) ));
+          $tmp = trim(substr($row, $i + strlen(REST_ROUTE_DOC_COMMENT) ));
+
+          // Enable @Route( ... ) syntax
+          $len = strlen($tmp);
+          if ( $len >= 2 && $tmp[0] === '(' && $tmp[ $len - 1 ] === ')' ) {
+              $tmp = trim(substr($tmp, 1, $len - 2));
+          }
+
+          return $tmp;
 
         },
 

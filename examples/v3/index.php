@@ -45,8 +45,8 @@ class MyHelloRequest {
    * Replace hello resource completely
    *
    * @return string|null
-   * @request put
    * @noinspection PhpUnused
+   * @Route(put)
    */
   public function replace () {
 
@@ -67,8 +67,8 @@ class MyHelloRequest {
    * Fetch hello resource
    *
    * @return string|null
-   * @request get
-   * @request head
+   * @Route get
+   * @Route head
    * @noinspection PhpUnused
    */
   public function fetch () {
@@ -89,7 +89,7 @@ class MyHelloRequest {
 class MyAPI {
 
   /**
-   * @request /hello
+   * @Route /hello
    * @noinspection PhpUnused
    * @throws Exception if headers already sent
    */
@@ -108,7 +108,7 @@ class MyAPI {
   /**
    * Change API data completely
    *
-   * @request put /
+   * @Route put /
    * @noinspection PhpUnused
    */
   static public function update () {
@@ -131,8 +131,8 @@ class MyAPI {
   /**
    * Fetch complete API data
    *
-   * @request get /
-   * @request head /
+   * @Route get /
+   * @Route head /
    * @noinspection PhpUnused
    */
   static public function fetch () {
@@ -146,7 +146,7 @@ class MyAPI {
   /**
    * Testing single parameter syntax
    *
-   * @request get /ping/?
+   * @Route( get /ping/? )
    * @param $param1
    * @return mixed
    * @noinspection PhpUnused
@@ -161,7 +161,7 @@ class MyAPI {
   /**
    * Testing two single parameters syntax
    *
-   * @request get /ping/?/?
+   * @Route( get /ping/?/? )
    * @param $param1
    * @param $param2
    * @return mixed
@@ -179,9 +179,9 @@ class MyAPI {
    * @param $param2
    * @param $obj
    * @return array
-   * @request get /ping/?/?/:foo
-   * @request get /ping/?/?/:foo/:bar
-   * @request get /ping/?/?/:foo/:bar/*
+   * @Route get /ping/?/?/:foo
+   * @Route get /ping/?/?/:foo/:bar
+   * @Route get /ping/?/?/:foo/:bar/*
    * @noinspection PhpUnused
    */
   static public function ping3 ($param1, $param2, $obj) {
@@ -195,7 +195,7 @@ class MyAPI {
   /**
    * Other methods for / only
    *
-   * @request * /
+   * @Route * /
    * @noinspection PhpUnused
    * @throws Exception if headers already sent
    */
