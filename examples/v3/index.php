@@ -67,7 +67,8 @@ class MyHelloRequest {
    * Fetch hello resource
    *
    * @return string|null
-   * @request get|head
+   * @request get
+   * @request head
    * @noinspection PhpUnused
    */
   public function fetch () {
@@ -95,7 +96,7 @@ class MyAPI {
 
     Log::debug('--- Matched /hello ---');
 
-    Request::match(MyHelloRequest::class );
+    Request::run(MyHelloRequest::class );
 
     # Other for /hello
     Log::debug('--- Matched /hello with other method ---');
@@ -126,7 +127,8 @@ class MyAPI {
   /**
    * Fetch complete API data
    *
-   * @request get|head /
+   * @request get /
+   * @request head /
    * @noinspection PhpUnused
    */
   static public function fetch () {
@@ -217,7 +219,7 @@ class MyAPI {
 
 Request::run( function () {
 
-  Request::match(MyAPI::class);
+  Request::run(MyAPI::class);
 
   MyAPI::notFoundError();
 
