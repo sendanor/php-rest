@@ -9,7 +9,9 @@ namespace SimpleREST;
 use Exception;
 use TypeError;
 use Throwable;
+use Closure;
 use ReflectionClass;
+use ReflectionException;
 
 if (!defined('REST_DOC_COMMENT')) {
   define('REST_DOC_COMMENT', '@request');
@@ -297,6 +299,82 @@ class Request {
   }
 
   /**
+   * @param string $className
+   * @throws ReflectionException if the class does not exist
+   */
+  public static function matchUsingReflectionClass ($className) {
+
+    $reflection = new ReflectionClass($className);
+
+    $methods = $reflection->getMethods();
+
+    $obj = null;
+
+    foreach($methods as $method) {
+
+      $search = array_filter(array_map(
+
+        function($row) {
+
+          $i = strpos($row, REST_DOC_COMMENT);
+
+          if ($i === FALSE) return NULL;
+
+          return trim(substr($row, $i + strlen(REST_DOC_COMMENT) ));
+
+        },
+
+        explode("\n", $method->getDocComment())
+      ), function ($item) {
+        return !is_null($item);
+      });
+
+      Log\debug('METHOD COMMENT = ', $search );
+
+      if ($method->IsStatic()) {
+
+        $cb = self::_createCallbackFromStaticReflectionMethod($method);
+
+      } else {
+
+        if ($obj === null) $obj = new $className();
+
+        $cb = self::_createCallbackFromReflectionMethod($method, $obj);
+
+      }
+
+      Request::match($search, $cb);
+
+    }
+
+  }
+
+  /**
+   * @param $method
+   * @return Closure
+   */
+  protected static function _createCallbackFromStaticReflectionMethod (&$method) {
+
+    return function(...$args) use(&$method) {
+      return $method->invokeArgs(null, $args);
+    };
+
+  }
+
+  /**
+   * @param $obj
+   * @param $method
+   * @return Closure
+   */
+  protected static function _createCallbackFromReflectionMethod (&$method, &$obj) {
+
+    return function(...$args) use(&$method, &$obj) {
+      return $method->invokeArgs($obj, $args);
+    };
+
+  }
+
+  /**
    * Run a request with optional params to the callback.
    *
    * @param callable|string $f The function to call or a class name
@@ -315,55 +393,7 @@ class Request {
       }
 
       if ( is_string($f) && class_exists($f, TRUE) ) {
-
-        $reflection = new ReflectionClass($f);
-
-        $methods = $reflection->getMethods();
-
-        foreach($methods as $method) {
-
-          $search = array_filter(array_map(
-
-            function($row) {
-
-              $i = strpos($row, REST_DOC_COMMENT);
-
-              if ($i === FALSE) return NULL;
-
-              return trim(substr($row, $i + strlen(REST_DOC_COMMENT) ));
-
-            },
-
-            explode("\n", $method->getDocComment())
-          ), function ($item) {
-            return !is_null($item);
-          });
-
-          Log\debug('METHOD COMMENT = ', $search );
-
-          $obj = null;
-          $cb = null;
-
-          if ($method->IsStatic()) {
-
-            $cb = function(...$args) use(&$method) {
-              return $method->invokeArgs(null, $args);
-            };
-
-          } else {
-
-            if ($obj === null) $obj = new $f();
-
-            $cb = function(...$args) use(&$method, &$obj) {
-              return $method->invokeArgs($obj, $args);
-            };
-
-          }
-
-          Request::match($search, $cb);
-
-        }
-
+        self::matchUsingReflectionClass($f);
         return;
       }
 
@@ -380,34 +410,28 @@ class Request {
       exit(0);
 
     } catch (Exception $e) {
-
-      Log\error('Exception: ' . $e);
-
-      if (!Response::isSent()) {
-        try {
-          Response::outputException($e);
-        } catch (Exception $e2) {
-          Log\error('Exception while printing previous exception: ' . $e2);
-        }
-      }
-
-      exit(1);
-
+	    self::_handleError($e);
     } catch (Throwable $e) {
-
-      Log\error('Error: ' . $e);
-
-      if (!Response::isSent()) {
-        try {
-          Response::outputException($e);
-        } catch (Exception $e2) {
-          Log\error('Exception while printing previous exception: ' . $e2);
-        }
-      }
-
-      exit(1);
-
+	    self::_handleError($e);
     }
+
+  }
+
+  protected static function _handleError ($e) {
+
+    Log\error('Error: ' . $e);
+
+    if (!Response::isSent()) {
+      try {
+        Response::outputException($e);
+      } catch (Exception $e2) {
+        Log\error('Exception while printing previous exception: ' . $e2);
+      } catch (Throwable $e2) {
+        Log\error('Error while printing previous exception: ' . $e2);
+      }
+    }
+
+    exit(1);
 
   }
 
@@ -508,6 +532,10 @@ class Request {
       } catch (Exception $e) {
 
           Log\error("Exception while preparing the response for previous fatal error: " . $e);
+
+      } catch (Throwable $e) {
+
+          Log\error("Error while preparing the response for previous fatal error: " . $e);
 
       }
 
