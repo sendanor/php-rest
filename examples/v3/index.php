@@ -4,19 +4,24 @@ require_once( dirname(__FILE__) . '/config.php');
 
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/index.php' );
 
+use SimpleREST\File\PHP as PHPTemplate;
 use SimpleREST\Request as Request;
 use SimpleREST\Response as Response;
 use SimpleREST\Log\Log as Log;
 
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
 
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/JSON/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/PHP/index.php' );
+
 use SimpleREST\File\JSON as JSON;
 use SimpleREST\File\EditableJSON as EditableJSON;
 
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Mail/index.php' );
 
-use SimpleREST\Mail\Mailer as Mailer;
-use SimpleREST\Mail\Message as Message;
+use SimpleREST\Mail\Mailer;
+use SimpleREST\Mail\Message;
+use SimpleREST\Mail\SentMessage;
 
 /**
  * Class MyHelloRequest
@@ -92,6 +97,22 @@ class MyHelloRequest {
  * Class MyAPIRequest
  */
 class MyAPI {
+
+  /**
+   * @var Closure|null
+   */
+  static protected $_email_template = null;
+
+  /**
+   * @throws Exception
+   */
+  static protected function _initTemplate () {
+
+    if (self::$_email_template === null) {
+      self::$_email_template = new PHPTemplate( dirname(__FILE__) . '/template.php' );
+    }
+
+  }
 
   /**
    * @Route /hello
@@ -198,12 +219,40 @@ class MyAPI {
   }
 
   /**
+   * @param Message $msg
+   * @return string
+   * @throws Exception
+   */
+  static protected function _getMailTemplate ($msg) {
+
+    self::_initTemplate();
+
+    return self::$_email_template->execute( array('message' => $msg) );
+
+  }
+
+  /**
+   * @Route post /getMailTemplate
+   * @return string
+   * @noinspection PhpUnused
+   */
+  static public function getMailTemplate () {
+
+    $msg = Request::getInput();
+
+    return self::_getMailTemplate($msg);
+
+  }
+
+  /**
    * @Route post /sendMail
-   * @return array
+   * @return SentMessage
    * @throws \SimpleREST\Mail\MailError if cannot send email
    * @noinspection PhpUnused
    */
   static public function sendMail () {
+
+    self::_initTemplate();
 
     $msg = Request::getInput();
 

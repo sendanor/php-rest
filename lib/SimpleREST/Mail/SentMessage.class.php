@@ -12,6 +12,7 @@ use JsonSerializable;
  *
  * Envelope class for sent Messages.
  *
+ * @property bool sent If true, the message has been successfully delivered to local queue. This does not mean the mail is received.
  * @property bool success If true, the message has been successfully delivered to the mail system. This does not mean the mail is received.
  * @property string to
  * @property string subject
