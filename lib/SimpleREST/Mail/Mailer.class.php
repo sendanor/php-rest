@@ -1,0 +1,80 @@
+<?php
+/*
+ * Copyright 2020 Sendanor <info@sendanor.fi>
+ */
+namespace SimpleREST\Mail;
+
+use TypeError;
+
+/**
+ * Abstract Class Mailer
+ *
+ * Base class for our mailers.
+ *
+ * @package SimpleREST\Mail
+ */
+class Mailer {
+
+  /**
+   * @var BaseMailer|null
+   */
+  static private $_mailer = null;
+
+  /**
+   * @param BaseMailer $mailer
+   */
+  public static function setMailer (BaseMailer $mailer) {
+    self::$_mailer = $mailer;
+  }
+
+  /**
+   * @return BaseMailer
+   */
+  public static function createDefaultMailer () {
+
+    return self::createMailer( defined('REST_MAILER') ? REST_MAILER : 'php' );
+
+  }
+
+  /**
+   * Creates a mailer by string name
+   *
+   * @param string $name The name of mailer
+   * @return BaseMailer
+   */
+  public static function createMailer ($name) {
+
+    switch ($name) {
+
+      case "file":
+        require_once( dirname(__FILE__) . '/File/index.php');
+        return new FileMailer();
+
+      case "php":
+        require_once( dirname(__FILE__) . '/PHP/index.php');
+        return new PHPMailer();
+
+      default:
+        throw new TypeError('Unknown mailer: ' . $name);
+
+    }
+
+  }
+
+
+  /**
+   * @param Message $msg
+   * @return SentMessage
+   * @throws MailError if cannot send the mail
+   */
+  public static function send (Message $msg) {
+
+    if (self::$_mailer === null) {
+      self::$_mailer = self::createDefaultMailer();
+    }
+
+    return self::$_mailer->send($msg);
+
+  }
+
+}
