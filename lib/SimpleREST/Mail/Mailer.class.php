@@ -40,19 +40,20 @@ class Mailer {
    * Creates a mailer by string name
    *
    * @param string $name The name of mailer
+   * @param mixed|null $opt Optional options
    * @return BaseMailer
    */
-  public static function createMailer ($name) {
+  public static function createMailer ($name, $opt = null) {
 
     switch ($name) {
 
       case "file":
         require_once( dirname(__FILE__) . '/File/index.php');
-        return new FileMailer();
+        return new FileMailer($opt);
 
       case "php":
         require_once( dirname(__FILE__) . '/PHP/index.php');
-        return new PHPMailer();
+        return new PHPMailer($opt);
 
       default:
         throw new TypeError('Unknown mailer: ' . $name);
@@ -74,6 +75,21 @@ class Mailer {
     }
 
     return self::$_mailer->send($msg);
+
+  }
+
+  /**
+   * @param Message[] $messages
+   * @return SentMessage
+   * @throws MailError if cannot send the mail
+   */
+  public static function sendMessages (array $messages) {
+
+    if (self::$_mailer === null) {
+      self::$_mailer = self::createDefaultMailer();
+    }
+
+    return self::$_mailer->sendMessages($messages);
 
   }
 

@@ -4,4 +4,4 @@
  */
 
 require_once( dirname(__FILE__) . '/SentMessagesEditableJSONFile.class.php');
-require_once( dirname(__FILE__) . '/FileMail.class.php');
+require_once( dirname(__FILE__) . '/FileMailer.class.php');

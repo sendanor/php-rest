@@ -52,11 +52,11 @@ class FileMailer extends BaseMailer {
 
     try {
 
-      $sentMsg = new SentMessage($msg, false);
+      $sentMsg = new SentMessage($msg, false, false);
 
       $DATA = new SentMessagesEditableJSONFile($this->_file);
 
-      $messages = $DATA->messages;
+      $messages = $DATA->messages ?? array();
       array_push($messages, $sentMsg);
       $DATA->messages = $messages;
 
@@ -81,7 +81,7 @@ class FileMailer extends BaseMailer {
     try {
 
       $sentMessages = array_map(function($msg) {
-        return new SentMessage($msg, false);
+        return new SentMessage($msg, false, false);
       }, $messages);
 
       $DATA = new SentMessagesEditableJSONFile($this->_file);

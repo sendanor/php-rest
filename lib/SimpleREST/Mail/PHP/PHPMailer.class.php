@@ -51,7 +51,7 @@ class PHPMailer extends BaseMailer {
       throw new MailError(self::_getLastMessageError(), null, null, $msg);
     }
 
-    return new SentMessage($msg, $success);
+    return new SentMessage($msg, true, $success);
 
   }
 
@@ -70,7 +70,7 @@ class PHPMailer extends BaseMailer {
         Log::warning('Warning! Could not send mail to "'. $msg->to .'": ' . self::_getLastMessageError() );
       }
 
-      return new SentMessage($msg, $success);
+      return new SentMessage($msg, true, $success);
 
     }, $messages);
 

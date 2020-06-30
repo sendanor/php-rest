@@ -5,6 +5,7 @@
 namespace SimpleREST\Mail;
 
 use TypeError;
+use JsonSerializable;
 
 /**
  * Class PHPMailer
@@ -17,7 +18,7 @@ use TypeError;
  * @property array headers
  * @package SimpleREST\Mail
  */
-class Message {
+class Message implements JsonSerializable {
 
   /**
    * @var string
@@ -92,6 +93,29 @@ class Message {
    */
   public function getHeader ($name) {
     return $this->_headers !== null ? ( isset($this->_headers[$name]) ? $this->_headers[$name] : null ) : null;
+  }
+
+
+  /**
+   * @return string
+   */
+  public function __toString () {
+    return "Message(To:" . $this->to . ";Subject:" . $this->subject . ")";
+  }
+
+  /**
+   * @return string[]
+   * @noinspection PhpUnused
+   */
+  public function jsonSerialize () {
+
+    return array(
+      "to" => $this->to,
+      "subject" => $this->subject,
+      "body" => $this->body,
+      "headers" => $this->headers ?? array()
+    );
+
   }
 
 }

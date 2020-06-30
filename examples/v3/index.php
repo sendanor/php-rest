@@ -13,6 +13,11 @@ require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.
 use SimpleREST\File\JSON as JSON;
 use SimpleREST\File\EditableJSON as EditableJSON;
 
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Mail/index.php' );
+
+use SimpleREST\Mail\Mailer as Mailer;
+use SimpleREST\Mail\Message as Message;
+
 /**
  * Class MyHelloRequest
  */
@@ -189,6 +194,25 @@ class MyAPI {
     Log::debug('--- Matched /ping/?/?/... with GET method ---');
 
     return [$param1, $param2, $obj];
+
+  }
+
+  /**
+   * @Route post /sendMail
+   * @return array
+   * @throws \SimpleREST\Mail\MailError if cannot send email
+   * @noinspection PhpUnused
+   */
+  static public function sendMail () {
+
+    $msg = Request::getInput();
+
+    return Mailer::send( new Message(
+      $msg['to'],
+      $msg['subject'],
+      $msg['body'] ?? '',
+      $msg['headers'] ?? array()
+    ) );
 
   }
 
