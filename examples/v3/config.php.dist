@@ -8,6 +8,9 @@
 // Set logger (syslog or stderr)
 define('REST_LOGGER', 'stderr');
 
+define('REST_MAILER_FILE', dirname(__FILE__) . "/sent.json");
+define('REST_MAILER', 'file');
+
 // The data for JSON file example
 define('REST_DATA_FILE', dirname(__FILE__) . "/data.json");
 
