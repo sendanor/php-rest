@@ -34,7 +34,7 @@ class Text implements JsonSerializable {
    * Text file reader constructor.
    *
    * @param $file string
-   * @throws Exception
+   * @throws Exception if cannot open lock file or file handle not found
    */
   public function __construct ($file) {
 

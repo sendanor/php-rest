@@ -24,11 +24,11 @@ class EditableJSON extends JSON {
    */
   private $_changed = false;
 
-
   /**
    * EditableJSON constructor.
    *
    * @param $file string
+   * @throws Exception if cannot open lock file or file handle not found
    */
   public function __construct ( $file ) {
 
@@ -72,11 +72,18 @@ class EditableJSON extends JSON {
 
   }
 
+  /**
+   *
+   */
+  public function save () {
+    $this->_save();
+  }
 
   protected function _save () {
 
-    if ($this->_changed) {
+    if ($this->_changed !== false) {
       file_put_contents( $this->_getFileName(), json_encode($this->_getData()) . "\n" );
+      $this->_changed = false;
     }
 
   }
