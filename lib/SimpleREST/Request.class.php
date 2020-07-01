@@ -525,8 +525,8 @@ class Request {
 
       try {
 
+        Log\debug("Sending error response.");
         Response::setStatus(500, "Backend Error");
-
         Response::setHeader('Content-Type', 'application/json');
 
         if (self::isProduction()) {
@@ -545,9 +545,10 @@ class Request {
             'line' => $error['line'],
             'message' => $error['message']
           ));
-          exit(1);
 
         }
+
+        exit(1);
 
       } catch (Exception $e) {
 
@@ -559,6 +560,8 @@ class Request {
 
       }
 
+    } else {
+      Log\debug('No errors detected.');
     }
 
   }

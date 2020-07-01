@@ -28,10 +28,24 @@ class Response {
    *
    * @param $data mixed
    * @return string
+   * @throws Exception if JSON encoding fails
    */
 	public static function getJSONResponse ($data) {
 
-		return json_encode($data);
+	  try {
+
+      $data = json_encode($data);
+
+      if ($data === "") {
+        throw new Exception('Empty string from JSON encoding!');
+      }
+
+      return $data;
+
+    } catch(Throwable $e) {
+	    Log\error("ERROR: ", $e);
+	    throw new Exception('JSON encoding failed!');
+    }
 
 	}
 
@@ -41,11 +55,23 @@ class Response {
    */
 	public static function outputString ($data) {
 
+	  Log\debug('Sending response headers...');
+
 		self::_outputHeaders();
+
+    Log\debug('Sending response status...');
 
 		self::_outputStatus();
 
-		echo "" . $data . "\n";
+		$len = strlen($data);
+
+    if ($len > 255) {
+      Log\debug('Sending response data (' . $len . ' length)...');
+    } else {
+      Log\debug('Sending response data (' . $len . ' length: "'.$data.'")...');
+    }
+
+    echo "" . $data . "\n";
 
     self::$output_sent = true;
 
@@ -68,11 +94,7 @@ class Response {
 	/** */
 	public static function isHeadersSent () {
 
-		if (headers_sent()) {
-			return true;
-		}
-
-		return false;
+		return !!headers_sent();
 
 	}
 
