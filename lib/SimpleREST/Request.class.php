@@ -20,6 +20,11 @@ if (!defined('REST_ROUTE_DOC_COMMENT')) {
 class Request {
 
   /**
+   * @var OutputBuffer|null
+   */
+  private static $_outputBuffer = null;
+
+  /**
    * @var bool
    */
   private static $_started = false;
@@ -43,6 +48,13 @@ class Request {
    * @var bool
    */
   private static $_inputFetched = false;
+
+  /**
+   * Previous error handler if we have enabled our own.
+   *
+   * @var mixed|null
+   */
+  private static $_oldErrorHandler = null;
 
   /**
    * Returns current method name, all lowercase characters.
@@ -395,10 +407,10 @@ class Request {
    */
 	public static function run ($f, ...$params) {
 
-	  try {
+    try {
 
-	    if (!self::$_started) {
-	      self::start( self::getDefaultName() );
+      if (!self::$_started) {
+        self::start( self::getDefaultName() );
       }
 
       if (Response::isSent()) {
@@ -458,10 +470,10 @@ class Request {
   /**
    * Initialize default request handlers
    *
-   * @param string $name The application name for logging
+   * @param string|null $name Optional application name for logging. If not defined, can also be defined using `REST_LOGGER_NAME`.
    * @throws Exception if already started
    */
-  public static function start ($name) {
+  public static function start ($name = null) {
 
     if (self::$_started === true) {
       throw new Exception('Cannot start request again.');
@@ -469,14 +481,78 @@ class Request {
 
     self::$_started = true;
 
+    require_once( dirname(__FILE__) . '/Log/index.php' );
     Log\setLogger( Log\Manager::createDefaultLogger($name) );
-
     Log\debug("Request started in development mode.");
+
+    //ob_end_clean();
+    //header("Connection: close");
+    ignore_user_abort(true);
+    error_reporting(0);
+
+    require_once( dirname(__FILE__) . '/OutputBuffer.class.php' );
+
+    self::$_outputBuffer = new OutputBuffer( function ($output) {
+      return self::_onOutput($output);
+    } );
+
+    self::$_oldErrorHandler = set_error_handler(array("SimpleREST\Request", "_onError"));
 
     self::enableShutdownHandler();
 
+    require_once( dirname(__FILE__) . '/HTTPError.class.php' );
+    require_once( dirname(__FILE__) . '/HTTPStatusMessages.class.php' );
+    require_once( dirname(__FILE__) . '/Response.class.php' );
+
     Log\debug("Request initialized.");
 
+  }
+
+  /**
+   * @param int $errno
+   * @param string $errorMessage
+   * @param string $errorFile
+   * @param int $errorLine
+   * @param array $errorContext
+   */
+  protected static function _onError ($errno, $errorMessage, $errorFile, $errorLine, $errorContext) {
+
+    Log\error("ERROR: ", $errno, $errorMessage, $errorFile, $errorLine, $errorContext);
+
+  }
+
+  /**
+   * @param string $output
+   * @return string
+   */
+  protected static function _onOutput ($output) {
+
+    if (!self::_isJson($output)) {
+
+      Log\error('The output was not valid JSON:', $output, '(' . strlen($output) . ' bytes)');
+
+      $output = json_encode( Response::getErrorResponse(500, "Internal Server Error") );
+
+    } else {
+
+      Log\debug('The output was valid JSON (' . strlen($output) . ' bytes)');
+
+    }
+
+    // This will make browser(s) end the connection as soon as everything has been delivered
+    header('Content-Length: ' . strlen($output) );
+
+    return $output;
+
+  }
+
+  /**
+   * @param string $string
+   * @return bool
+   */
+  private static function _isJson(string $string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
   }
 
   /**
@@ -499,7 +575,18 @@ class Request {
    * @return string
    */
   public static function getDefaultName () {
-    return defined('REST_NAME') ? REST_NAME : 'unnamed';
+
+    return defined('REST_NAME') ? REST_NAME : self::getDefaultLoggerName();
+
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDefaultLoggerName () {
+
+    return defined('REST_LOGGER_NAME') ? REST_LOGGER_NAME : 'unnamed';
+
   }
 
   /**
@@ -565,6 +652,5 @@ class Request {
     }
 
   }
-
 
 }

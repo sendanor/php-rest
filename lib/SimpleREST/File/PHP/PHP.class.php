@@ -9,7 +9,6 @@ namespace SimpleREST\File;
 use Exception;
 use Closure;
 use Throwable;
-use stdClass;
 
 /**
  * Implements readable accessor for text files in the filesystem.
@@ -42,7 +41,6 @@ class PHP {
    * Text file reader constructor.
    *
    * @param string $file
-   * @throws Exception if cannot open lock file or file handle not found
    */
   public function __construct (string $file) {
 
@@ -89,7 +87,7 @@ class PHP {
 
         $SCOPE->result = $sandbox_cb($options);
 
-      } catch (\Throwable $e) {
+      } catch (Throwable $e) {
 
         $SCOPE->result = null;
         $SCOPE->error = $e;
@@ -118,7 +116,7 @@ class PHP {
    *
    * @param array $options Optional options
    * @return string
-   * @throws Exception if template function does not return Scope
+   * @throws Exception if template function does not return internal scope object
    */
   public function execute (array $options = array()) {
 

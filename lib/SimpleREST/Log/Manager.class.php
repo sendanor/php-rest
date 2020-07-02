@@ -29,11 +29,12 @@ abstract class Manager {
 
   /**
    * @return BaseLogger
+   * @throws Exception if no logger defined and default logger cannot open standard error stream
    */
   public static function getLogger () {
 
     if (self::$logger === null) {
-      self::$logger = new ErrorLog();
+      self::$logger = self::createDefaultLogger();
     }
 
     return self::$logger;
@@ -46,7 +47,12 @@ abstract class Manager {
    * @throws Exception if $name is not a string
    * @throws TypeError if REST_LOGGER is defined and is not correct logger name
    */
-  public static function createDefaultLogger ($name) {
+  public static function createDefaultLogger ( $name = null ) {
+
+    if ($name === null) {
+      $name = defined('REST_LOGGER_NAME') ? REST_LOGGER_NAME : "default";
+    }
+
     return createLogger( defined('REST_LOGGER') ? REST_LOGGER : 'stderr', $name);
   }
 
