@@ -103,9 +103,10 @@ class MySQLQuery implements iQuery {
       throw new Exception('Failed to execute query: ' . $this->_st->error . '(' . $this->_st->errno . ')');
     }
 
-    Log::debug( 'We got ' . $this->_st->num_rows . ' rows.');
+//    Log::debug( 'We got ' . $this->_st->num_rows . ' rows.');
+//    return $this->_st->num_rows > 1 ? $this->_fetchResults() : array();
 
-    return $this->_st->num_rows > 1 ? $this->_fetchResults() : array();
+    return $this->_fetchResults();
 
   }
 
@@ -153,15 +154,20 @@ class MySQLQuery implements iQuery {
    */
   protected function _fetchResults () {
 
-    $keys = array();
-    $values = array();
-
     $meta = $this->_st->result_metadata();
 
     if ($meta === FALSE) {
-      throw new Exception('Failed to fetch meta data: ' . $this->_st->error . '(' . $this->_st->errno . ')');
+
+      if ($this->_st->error) {
+        throw new Exception('Failed to fetch meta data: ' . $this->_st->error . '(' . $this->_st->errno . ')');
+      }
+
+      // This statement did not return a result set
+      return array();
     }
 
+    $keys = array();
+    $values = array();
     try {
 
       while ( $field = $meta->fetch_field() ) {
