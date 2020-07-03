@@ -27,11 +27,11 @@ use SimpleREST\Mail\Message;
 use SimpleREST\Mail\SentMessage;
 
 if (!defined('SELECT_REG_QUERY')) {
-  define('SELECT_REG_QUERY', /** @lang text */ 'SELECT * FROM reg');
+  define('SELECT_REG_QUERY', /** @lang text */ 'SELECT * FROM email_auth');
 }
 
 if (!defined('INSERT_REG_QUERY')) {
-  define('INSERT_REG_QUERY', /** @lang text */ 'INSERT INTO reg (reg_email) VALUES (?)');
+  define('INSERT_REG_QUERY', /** @lang text */ 'INSERT INTO email_auth (email_auth_email) VALUES (?)');
 }
 
 /**
