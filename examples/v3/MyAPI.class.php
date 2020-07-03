@@ -1,24 +1,38 @@
 <?php
 
+/** @noinspection SqlNoDataSourceInspection */
+/** @noinspection SqlDialectInspection */
+
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/index.php' );
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/JSON/index.php' );
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/PHP/index.php' );
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Mail/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Database/index.php' );
 require_once( dirname(__FILE__) . '/MyHelloRequest.class.php' );
 
 use SimpleREST\Request as Request;
 use SimpleREST\Response as Response;
 
-use SimpleREST\Log\Log as Log;
+use SimpleREST\Log\Log;
+use SimpleREST\Database;
+use SimpleREST\HTTPError;
 
 use SimpleREST\File\PHP as PHPTemplate;
-use SimpleREST\File\JSON as JSON;
-use SimpleREST\File\EditableJSON as EditableJSON;
+use SimpleREST\File\JSON;
+use SimpleREST\File\EditableJSON ;
 
 use SimpleREST\Mail\MailError;
 use SimpleREST\Mail\Mailer;
 use SimpleREST\Mail\Message;
 use SimpleREST\Mail\SentMessage;
+
+if (!defined('SELECT_REG_QUERY')) {
+  define('SELECT_REG_QUERY', /** @lang text */ 'SELECT * FROM reg');
+}
+
+if (!defined('INSERT_REG_QUERY')) {
+  define('INSERT_REG_QUERY', /** @lang text */ 'INSERT INTO reg (reg_email) VALUES (?)');
+}
 
 /**
  * Class MyAPIRequest
@@ -217,6 +231,69 @@ class MyAPI {
 
     Log::debug('--- Unknown request ---');
     Response::outputError(404);
+
+  }
+
+  /**
+   * Database select example
+   *
+   * @Route get /reg
+   * @Route head /reg
+   * @noinspection PhpUnused
+   * @throws Exception if binding failed in result params
+   */
+  static public function fetchReg () {
+
+    Log::debug('--- Matched /reg with GET or HEAD method ---');
+
+    $db = Database\Connection::create();
+
+    $rows = $db->query(SELECT_REG_QUERY);
+
+    return array(
+      "ok" => true,
+      "type" => "reg:list",
+      "payload" => $rows
+    );
+
+  }
+
+  /**
+   * Database insert example
+   *
+   * @Route post /reg
+   * @noinspection PhpUnused
+   * @throws Exception if binding failed in result params
+   * @throws HTTPError with 422 if email address is incorrect in input
+   * @throws HTTPError with 409 if email address is already in the database
+   */
+  static public function insertReg () {
+
+    Log::debug('--- Matched /reg with GET or HEAD method ---');
+
+    $input = Request::getInput() ?? null;
+
+    $email = $input['email'] ?? null;
+
+    if (!SimpleREST\Validate::isEmail($email)) {
+      throw new HTTPError(422, "email param is incorrect");
+    }
+
+    $db = Database\Connection::create();
+
+    try {
+
+      return $db->query(INSERT_REG_QUERY, array($email));
+
+    } catch (Exception $e) {
+
+      if ( stripos("duplicate", $e->getMessage()) >= 0 ) {
+        throw new HTTPError(409);
+      }
+
+      throw $e;
+
+    }
 
   }
 

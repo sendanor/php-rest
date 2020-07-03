@@ -11,3 +11,4 @@ if(!defined('REST_PHP')) {
 }
 
 require_once( dirname(__FILE__) . '/Request.class.php' );
+require_once( dirname(__FILE__) . '/Validate.class.php' );
