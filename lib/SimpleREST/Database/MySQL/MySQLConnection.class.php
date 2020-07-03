@@ -7,7 +7,14 @@ use Exception;
 use SimpleREST\Log\Log;
 
 /**
- * Interface iDatabaseConnection
+ * Class MySQLConnection
+ *
+ * Users should not use these classes directly.
+ *
+ *     1. Get a iConnection instance using `SimpleREST\Database\Connection::create($config)`
+ *     2. Call `connection.createQuery($query)` or `connection.query($query[, $params])`
+ *
+ * @package SimpleREST\Database
  */
 class MySQLConnection implements iConnection {
 
@@ -17,7 +24,12 @@ class MySQLConnection implements iConnection {
   private $_db;
 
   /**
-   * iDatabaseConnection constructor.
+   * MySQLConnection constructor.
+   *
+   * Users should not use these classes directly.
+   *
+   *     1. Get a iConnection instance using `SimpleREST\Database\Connection::create($config)`
+   *     2. Call `connection.createQuery($query)` or `connection.query($query[, $params])`
    *
    * @param string|null $hostname
    * @param string|null $username

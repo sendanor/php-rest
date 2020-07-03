@@ -3,12 +3,16 @@
 namespace SimpleREST\Database;
 
 /**
- * Interface iDatabaseConnection
+ * Interface iConnection
  */
 interface iConnection {
 
   /**
-   * iDatabaseConnection constructor.
+   * iConnection constructor.
+   *
+   * Users should not use these constructors directly:
+   *
+   * Get a iConnection instance using `SimpleREST\Database\Connection::create($config)`
    *
    * @param string|null $hostname
    * @param string|null $username
