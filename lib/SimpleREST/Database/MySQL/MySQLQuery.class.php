@@ -103,7 +103,9 @@ class MySQLQuery implements iQuery {
       throw new Exception('Failed to execute query: ' . $this->_st->error . '(' . $this->_st->errno . ')');
     }
 
-    return $this->_fetchResults();
+    Log::debug( 'We got ' . $this->_st->num_rows . ' rows.');
+
+    return $this->_st->num_rows > 1 ? $this->_fetchResults() : array();
 
   }
 

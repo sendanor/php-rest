@@ -119,4 +119,11 @@ class MySQLConnection implements iConnection {
 
   }
 
+  /**
+   * @return mixed
+   */
+  public function getLastInsertID () {
+    return $this->_db->insert_id;
+  }
+
 }

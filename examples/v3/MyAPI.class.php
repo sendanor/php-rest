@@ -283,11 +283,19 @@ class MyAPI {
 
     try {
 
-      return $db->query(INSERT_REG_QUERY, array($email));
+       $db->query(INSERT_REG_QUERY, array($email));
+
+       $id = $db->getLastInsertID();
+
+       return array(
+         "ok" => true,
+         "id" => $id
+       );
 
     } catch (Exception $e) {
 
-      if ( stripos("duplicate", $e->getMessage()) >= 0 ) {
+      if ( stripos($e->getMessage(), "Duplicate entry") !== FALSE ) {
+        Log::error("Original exception: " . $e);
         throw new HTTPError(409);
       }
 
