@@ -46,6 +46,23 @@ class JSON {
   }
 
   /**
+   * @param mixed $value
+   * @return string
+   * @throws TypeError if encoding fails
+   */
+  public static function encodeObject ($value) {
+
+    $data = json_encode($value, JSON_FORCE_OBJECT);
+
+    if ($data === FALSE) {
+      throw new TypeError( 'Could not encode JSON: ' . self::_stringifyJsonError(json_last_error()) );
+    }
+
+    return $data;
+
+  }
+
+  /**
    * @param int $code
    * @return string
    * @throws TypeError if decoding fails
@@ -76,7 +93,14 @@ class JSON {
    */
   public static function isJSONString (string $data) {
     json_decode($data);
-    return json_last_error() == JSON_ERROR_NONE;
+    return json_last_error() === JSON_ERROR_NONE;
+  }
+
+  /**
+   * @return string
+   */
+  public static function getLastErrorString () {
+    return self::_stringifyJsonError(json_last_error());
   }
 
 }

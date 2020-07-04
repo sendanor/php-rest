@@ -13,19 +13,19 @@ use SimpleREST\JSON;
 use Exception;
 use TypeError;
 
-if (defined('FETCH_SESSION_SQL')) {
+if (!defined('FETCH_SESSION_SQL')) {
   define('FETCH_SESSION_SQL', 'SELECT * FROM `session` WHERE session_key = ? LIMIT 1');
 }
 
-if (defined('DELETE_SESSION_SQL')) {
+if (!defined('DELETE_SESSION_SQL')) {
   define('DELETE_SESSION_SQL', 'DELETE FROM `session` WHERE session_key = ? LIMIT 1');
 }
 
-if (defined('CREATE_SESSION_SQL')) {
+if (!defined('CREATE_SESSION_SQL')) {
   define('CREATE_SESSION_SQL', 'INSERT INTO `session` (session_key, session_value) VALUES (?, ?)');
 }
 
-if (defined('SAVE_SESSION_SQL')) {
+if (!defined('SAVE_SESSION_SQL')) {
   define('SAVE_SESSION_SQL', 'UPDATE `session` SET session_value = ? WHERE session_key = ? LIMIT 1');
 }
 
@@ -85,7 +85,7 @@ class Manager implements iManager {
 
       foreach ($this->_sessions as $key => $value) {
         try {
-          $this->_saveSession($key, $value);
+          $this->_saveSession($value->getKey(), $value);
         } catch (Exception $e) {
           Log::error('ERROR: ' . $e);
         }
@@ -117,7 +117,13 @@ class Manager implements iManager {
       throw new Exception('Session not found');
     }
 
-    $session = new Session( JSON::decode($row['value']), false );
+    $data = JSON::decode($row['session_value']);
+
+    if ( is_array($data) && count(array_keys($data)) === 0 ) {
+      $data = null;
+    }
+
+    $session = new Session($key, $data, false );
 
     $this->_sessions[] = $session;
 
@@ -132,9 +138,9 @@ class Manager implements iManager {
    */
   public function createSession ( string $key ) {
 
-    $session = new Session( array(), false );
+    $session = new Session($key, null, false );
 
-    $this->_db->query(CREATE_SESSION_SQL, array($key, JSON::encode($session)));
+    $this->_db->query(CREATE_SESSION_SQL, array($key, JSON::encodeObject($session)));
 
     $this->_sessions[] = $session;
 

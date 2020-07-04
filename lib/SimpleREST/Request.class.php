@@ -608,7 +608,7 @@ class Request {
 
     if (!JSON::isJSONString($output)) {
 
-      Log\error('The output was not valid JSON:', $output, '(' . strlen($output) . ' bytes)');
+      Log\error('The output was not valid JSON:', $output, '(' . strlen($output) . ' bytes): ' . JSON::getLastErrorString() );
 
       $output = JSON::encode( Response::getErrorResponse(500, "Internal Server Error") );
 

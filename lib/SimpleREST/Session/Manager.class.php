@@ -7,6 +7,10 @@ use SimpleREST\Response;
 use SimpleREST\Random;
 use Exception;
 
+if (!defined('REST_SESSION_HEADER')) {
+  define('REST_SESSION_HEADER', 'SessionId');
+}
+
 class Manager {
 
   /**
@@ -51,10 +55,6 @@ class Manager {
   public static function getSession () {
 
     self::initManager();
-
-    if (!defined('REST_SESSION_HEADER')) {
-      define('REST_SESSION_HEADER', 'SessionId');
-    }
 
     $sessionKey = Request::getHeader(REST_SESSION_HEADER);
 

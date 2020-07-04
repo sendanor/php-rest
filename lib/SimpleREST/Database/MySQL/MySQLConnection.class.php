@@ -5,6 +5,7 @@ namespace SimpleREST\Database;
 use mysqli;
 use Exception;
 use SimpleREST\Log\Log;
+use SimpleREST\Assert;
 
 /**
  * Class MySQLConnection
@@ -38,6 +39,7 @@ class MySQLConnection implements iConnection {
    * @param int|null $port
    * @param string|null $socket
    * @throws Exception if connection fails
+   * @throws Exception if mysqli extension not loaded
    */
   public function __construct (
     $hostname = null,
@@ -49,6 +51,8 @@ class MySQLConnection implements iConnection {
   ) {
 
     Log::debug('Connecting with', $hostname, $username, $password, $name, $port, $socket);
+
+    Assert::extensionLoaded("mysqli");
 
     $db = new mysqli($hostname, $username, $password, $name, $port, $socket);
 

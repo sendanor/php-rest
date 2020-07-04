@@ -361,7 +361,12 @@ class MyAPI {
 
     try {
 
-      return Session::getSession();
+      $session = Session::getSession();
+
+      return array(
+        "id" => $session->getKey(),
+        "payload" => $session
+      );
 
     } catch(Exception $e) {
 
@@ -384,7 +389,51 @@ class MyAPI {
 
     Log::debug('--- Matched /session with PUT method ---');
 
-    return Session::createSession();
+    $session = Session::createSession();
+
+    return array(
+      "id" => $session->getKey(),
+      "payload" => $session
+    );
+
+  }
+
+  /**
+   * Session update example
+   *
+   * @Route post /session
+   * @noinspection PhpUnused
+   * @throws Exception if fails to update session
+   */
+  static public function updateSession () {
+
+    Log::debug('--- Matched /session with POST method ---');
+
+    try {
+
+      $input = Request::getInput();
+
+      try {
+        $session = Session::getSession();
+      } catch (Exception $e) {
+        Log::error('Error: ' . $e);
+        throw new HTTPError(404);
+      }
+
+      $session->frontend = $input;
+
+      return array(
+        "id" => $session->getKey(),
+        "payload" => $session
+      );
+
+    } catch(Exception $e) {
+
+      Log::error('Error: ' . $e);
+
+      throw new HTTPError(500);
+
+    }
 
   }
 

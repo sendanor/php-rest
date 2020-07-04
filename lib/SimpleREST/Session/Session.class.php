@@ -6,6 +6,7 @@ use Exception;
 use JsonSerializable;
 use Serializable;
 use SimpleREST\JSON;
+use stdClass;
 
 /**
  * Class BaseSession
@@ -14,7 +15,12 @@ use SimpleREST\JSON;
 class Session implements JsonSerializable, Serializable {
 
   /**
-   * @var array
+   * @var string
+   */
+  private $_key;
+
+  /**
+   * @var array|null
    */
   private $_data;
 
@@ -26,10 +32,18 @@ class Session implements JsonSerializable, Serializable {
   /**
    * BaseSession constructor.
    *
-   * @param array $data
+   * @param string $key
+   * @param array|null $data
    * @param bool $changed
+   * @throws Exception if $data is an empty array
    */
-  public function __construct (array $data, bool $changed = false) {
+  public function __construct (string $key, $data = null, bool $changed = false) {
+
+    if ( is_array($data) && count(array_keys($data)) === 0 ) {
+      throw new Exception('Empty array not supported: use null instead.');
+    }
+
+    $this->_key = $key;
 
     $this->_data = $data;
 
@@ -48,6 +62,13 @@ class Session implements JsonSerializable, Serializable {
   }
 
   /**
+   * @return string
+   */
+  public function getKey () {
+    return $this->_key;
+  }
+
+  /**
    * @return bool
    */
   public function isChanged () {
@@ -60,6 +81,8 @@ class Session implements JsonSerializable, Serializable {
    */
   protected function _getProperty (string $key) {
 
+    if ($this->_data === null) return null;
+
     return $this->_data[$key];
 
   }
@@ -70,6 +93,8 @@ class Session implements JsonSerializable, Serializable {
    */
   protected function _issetProperty (string $key) {
 
+    if ($this->_data === null) return false;
+
     return isset($this->_data[$key]);
 
   }
@@ -79,6 +104,10 @@ class Session implements JsonSerializable, Serializable {
    * @param mixed $value
    */
   protected function _setProperty (string $key, $value) {
+
+    if ($this->_data === null) {
+      $this->_data = array();
+    }
 
     $this->_data[$key] = $value;
 
@@ -92,6 +121,8 @@ class Session implements JsonSerializable, Serializable {
    * @param string $key
    */
   protected function _unsetProperty (string $key) {
+
+    if ($this->_data === null) return;
 
     unset($this->_data[$key]);
 
@@ -143,10 +174,16 @@ class Session implements JsonSerializable, Serializable {
   }
 
   /**
-   * @return array
+   * @return array|stdClass
    */
   public function jsonSerialize () {
+
+    if ($this->_data === null) {
+      return new stdClass();
+    }
+
     return $this->_data;
+
   }
 
   /**
@@ -154,7 +191,7 @@ class Session implements JsonSerializable, Serializable {
    * @throws Exception if json encoding fails
    */
   public function serialize () {
-    return JSON::encode($this->_data);
+    return JSON::encode($this->jsonSerialize());
   }
 
   /**
@@ -163,7 +200,13 @@ class Session implements JsonSerializable, Serializable {
    */
   public function unserialize ($serialized) {
 
-    $this->_data = JSON::decode($serialized);
+    $data = JSON::decode($serialized);
+
+    if ( is_array($data) && count(array_keys($data)) === 0 ) {
+      $data = null;
+    }
+
+    $this->_data = $data;
 
   }
 
