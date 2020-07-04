@@ -50,6 +50,13 @@ class Request {
   private static $_inputFetched = false;
 
   /**
+   * Request headers
+   *
+   * @var array|null
+   */
+  private static $_headers = null;
+
+  /**
    * Previous error handler if we have enabled our own.
    *
    * @var mixed|null
@@ -134,7 +141,7 @@ class Request {
 			if ( self::isMethodGet() ) {
 				self::$_input = array();
 			} else {
-				self::$_input = json_decode(file_get_contents('php://input'), true);
+				self::$_input = JSON::decode( file_get_contents('php://input') );
 			}
 
       self::$_inputFetched = true;
@@ -144,6 +151,67 @@ class Request {
 		return self::$_input;
 
 	}
+
+  /**
+   * @throws Exception if fails to get headers
+   */
+	protected static function _initHeaders () {
+
+    $headers = getallheaders();
+
+    if ($headers === FALSE) {
+      throw new Exception('Failed to get request headers');
+    }
+
+    Assert::array($headers);
+
+    self::$_headers = $headers;
+
+  }
+
+  /**
+   * Returns the request headers
+   *
+   * @throws Exception if fails to get headers
+   * @return array
+   */
+	public static function getAllHeaders () {
+
+	  if (self::$_headers === null) self::_initHeaders();
+
+	  return self::$_headers;
+
+  }
+
+  /**
+   * Returns TRUE if header exists.
+   *
+   * @param string $key
+   * @return bool
+   * @throws Exception
+   */
+  public static function hasHeader (string $key) {
+
+    if (self::$_headers === null) self::_initHeaders();
+
+    return isset(self::$_headers[$key]);
+
+  }
+
+  /**
+   * Returns the header value by name.
+   *
+   * @param string $key
+   * @return string|null
+   * @throws Exception
+   */
+  public static function getHeader (string $key) {
+
+    if (self::$_headers === null) self::_initHeaders();
+
+    return isset(self::$_headers[$key]) ? self::$_headers[$key] : null;
+
+  }
 
   /**
    * @param string $search
@@ -258,6 +326,10 @@ class Request {
 
   }
 
+  /**
+   * @param $value
+   * @return array|string[]
+   */
   private static function _splitPath ($value) {
 
 	  return array_map(function($item) {
@@ -395,6 +467,10 @@ class Request {
 
   }
 
+  /**
+   * @param string $className
+   * @return bool
+   */
   protected static function _isClass ($className) {
     return is_string($className) && class_exists($className, TRUE);
   }
@@ -449,6 +525,9 @@ class Request {
 
   }
 
+  /**
+   * @param mixed $e
+   */
   protected static function _handleError ($e) {
 
     Log\error('Error: ' . $e);
@@ -527,11 +606,11 @@ class Request {
    */
   protected static function _onOutput ($output) {
 
-    if (!self::_isJson($output)) {
+    if (!JSON::isJSONString($output)) {
 
       Log\error('The output was not valid JSON:', $output, '(' . strlen($output) . ' bytes)');
 
-      $output = json_encode( Response::getErrorResponse(500, "Internal Server Error") );
+      $output = JSON::encode( Response::getErrorResponse(500, "Internal Server Error") );
 
     } else {
 
@@ -544,15 +623,6 @@ class Request {
 
     return $output;
 
-  }
-
-  /**
-   * @param string $string
-   * @return bool
-   */
-  private static function _isJson(string $string) {
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
   }
 
   /**

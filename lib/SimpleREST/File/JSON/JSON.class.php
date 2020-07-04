@@ -6,6 +6,8 @@
 
 namespace SimpleREST\File;
 
+use SimpleREST\JSON as JSONFormat;
+
 /**
  * Implements lock file implementation
  *
@@ -27,7 +29,7 @@ class JSON extends Text {
 
   public function __toString () {
 
-    return json_encode( $this->_getData() );
+    return JSONFormat::encode( $this->_getData() );
 
   }
 
@@ -51,9 +53,8 @@ class JSON extends Text {
 
   }
 
-
   protected function _loadData () {
-    return json_decode(parent::_loadData(), true);
+    return JSONFormat::decode( parent::_loadData() );
   }
 
 }

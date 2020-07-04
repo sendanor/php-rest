@@ -48,6 +48,8 @@ class MySQLConnection implements iConnection {
     $socket = null
   ) {
 
+    Log::debug('Connecting with', $hostname, $username, $password, $name, $port, $socket);
+
     $db = new mysqli($hostname, $username, $password, $name, $port, $socket);
 
     if ( $db->connect_error ) {

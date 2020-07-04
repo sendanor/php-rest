@@ -8,10 +8,13 @@ require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/JSON/i
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/File/PHP/index.php' );
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Mail/index.php' );
 require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Database/index.php' );
+require_once( dirname(dirname(dirname(__FILE__))) . '/lib/SimpleREST/Session/index.php' );
 require_once( dirname(__FILE__) . '/MyHelloRequest.class.php' );
 
 use SimpleREST\Request as Request;
 use SimpleREST\Response as Response;
+use SimpleREST\Random as Random;
+use SimpleREST\Session\Manager as Session;
 
 use SimpleREST\Log\Log;
 use SimpleREST\Database;
@@ -68,6 +71,45 @@ class MyAPI {
     # Other for /hello
     Log::debug('--- Matched /hello with other method ---');
     Response::outputError(405);
+
+  }
+
+  /**
+   * @Route get /randomInt/?/?
+   * @noinspection PhpUnused
+   * @throws Exception if headers already sent
+   */
+  static public function getRandomInt ($min = 0, $max = 10) {
+
+    Log::debug('--- Matched get /randomString ---');
+
+    return Random::int($min, $max);
+
+  }
+
+  /**
+   * @Route get /randomString/?
+   * @noinspection PhpUnused
+   * @throws Exception if headers already sent
+   */
+  static public function getRandomString ($len) {
+
+    Log::debug('--- Matched get /randomString ---');
+
+    return Random::string($len);
+
+  }
+
+  /**
+   * @Route get /randomHex/?
+   * @noinspection PhpUnused
+   * @throws Exception if headers already sent
+   */
+  static public function getRandomHex ($len) {
+
+    Log::debug('--- Matched get /randomHex ---');
+
+    return Random::hex($len);
 
   }
 
@@ -302,6 +344,47 @@ class MyAPI {
       throw $e;
 
     }
+
+  }
+
+  /**
+   * Session example
+   *
+   * @Route head /session
+   * @Route get /session
+   * @noinspection PhpUnused
+   * @throws HTTPError 404 if fails to get session
+   */
+  static public function getSession () {
+
+    Log::debug('--- Matched /session with GET or HEAD method ---');
+
+    try {
+
+      return Session::getSession();
+
+    } catch(Exception $e) {
+
+      Log::error('Error: ' . $e);
+
+      throw new HTTPError(404);
+
+    }
+
+  }
+
+  /**
+   * Session creation example
+   *
+   * @Route put /session
+   * @noinspection PhpUnused
+   * @throws Exception if fails to create session
+   */
+  static public function createSession () {
+
+    Log::debug('--- Matched /session with PUT method ---');
+
+    return Session::createSession();
 
   }
 
