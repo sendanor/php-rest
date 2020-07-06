@@ -6,6 +6,11 @@
 
 namespace SimpleREST;
 
+require_once( dirname(__FILE__) . '/Log/index.php' );
+require_once( dirname(__FILE__) . '/HTTPError.class.php' );
+require_once( dirname(__FILE__) . '/HTTPStatusMessages.class.php' );
+require_once( dirname(__FILE__) . '/Bootstrap/index.php' );
+
 use Exception;
 use TypeError;
 use Throwable;
@@ -15,6 +20,10 @@ use ReflectionException;
 
 if (!defined('REST_ROUTE_DOC_COMMENT')) {
   define('REST_ROUTE_DOC_COMMENT', '@Route');
+}
+
+if (!defined('REST_PATH')) {
+  define('REST_PATH', '');
 }
 
 class Request {
@@ -88,37 +97,56 @@ class Request {
 	public static function isMethodGet() {
 		return self::getMethod() === 'get';
 	}
-
+	
   /**
    * Returns current request path.
    *
    * Defaults to "/".
    *
    * @return string
+   * @throws HTTPError 404 if request is not under configured REST_PATH
    */
 	public static function getPath () {
 
 		if (self::$_path == null) {
 
-			if ( isset($_SERVER['PATH_INFO']) && strlen($_SERVER['PATH_INFO']) >= 1 ) {
+		  $path = Bootstrap\getPath();
 
-				self::$_path = $_SERVER['PATH_INFO'];
+			Log\debug('Path detected as: ' . $path . ' (with REST_PATH as '. REST_PATH . ')');
 
-			} else if ( isset($_SERVER['ORIG_PATH_INFO']) ) {
+			$len = strlen(REST_PATH);
+			if ($len !== 0) {
+        if (substr($path, 0, $len) === REST_PATH) {
+          $path = substr($path, $len);
+        } else {
+          Log\warning('Warning! path was not below configured REST_PATH: ' . REST_PATH);
+          throw new HTTPError(404);
+        }
+      }
 
-				self::$_path = $_SERVER['ORIG_PATH_INFO'];
+      Log\debug('Path set as: ' . $path);
 
-			} else {
+      self::$_path = $path;
 
-				self::$_path = "/";
-
-			}
-
-		}
+    }
 
 		return self::$_path;
 
 	}
+
+  /**
+   * @param string $path
+   * @return bool
+   */
+	public static function pathStartsWith (string $path) {
+
+	  try {
+  	  return Bootstrap\startsWith(self::getPath(), $path);
+    } catch (HTTPError $e) {
+      return false;
+    }
+
+  }
 
   /**
    * Returns current request query params.

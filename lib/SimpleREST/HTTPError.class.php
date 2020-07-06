@@ -21,10 +21,14 @@ class HTTPError extends Exception {
   /**
    * HTTPError constructor.
    *
+   * This constructor also throws Exceptions in case you provide incorrect input arguments. This is intentionally NOT
+   * defined in this PHPDoc so that you don't need to fix it in your PHPDoc everywhere you use this class.
+   *
    * @param int $code HTTP status code
    * @param null $message HTTP status message
    * @param Exception|null $previous
-   * @throws Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
 	public function __construct ($code = 500, $message = null, Exception $previous = null) {
 
@@ -33,11 +37,11 @@ class HTTPError extends Exception {
 		}
 
 		if(!is_string($message)) {
-			throw new Exception('wrong argument type for message in HTTPError', 0, $this);
+      throw new Exception('wrong argument type for message in HTTPError', 0, $this);
 		}
 
 		if(!is_long($code)) {
-			throw new Exception('wrong argument type for code in HTTPError', 0, $this);
+      throw new Exception('wrong argument type for code in HTTPError', 0, $this);
 		}
 
 		parent::__construct($message, $code, $previous);
