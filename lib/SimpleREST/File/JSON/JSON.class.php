@@ -54,7 +54,15 @@ class JSON extends Text {
   }
 
   protected function _loadData () {
-    return JSONFormat::decode( parent::_loadData() );
+
+    $dataString = parent::_loadData();
+
+    if ($dataString === NULL) {
+      return array();
+    }
+
+    return JSONFormat::decode( $dataString );
+
   }
 
 }

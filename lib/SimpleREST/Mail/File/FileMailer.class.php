@@ -7,6 +7,8 @@ namespace SimpleREST\Mail;
 use TypeError;
 use Exception;
 
+use SimpleREST\Log\Log;
+
 /**
  * Class FileMailer
  *
@@ -53,6 +55,8 @@ class FileMailer extends BaseMailer {
     try {
 
       $sentMsg = new SentMessage($msg, false, false);
+
+      Log::debug('Using file ' . $this->_file);
 
       $DATA = new SentMessagesEditableJSONFile($this->_file);
 

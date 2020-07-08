@@ -113,6 +113,10 @@ class Text implements JsonSerializable {
 
   }
 
+  /**
+   * @return string|null Returns the file contents as a string or if file does not exist, NULL.
+   * @throws Exception if file could not be read
+   */
   protected function _loadData () {
 
     // We must clear cache for file_exists
@@ -120,7 +124,17 @@ class Text implements JsonSerializable {
 
     $file = $this->_getFileName();
 
-    return file_exists($file) ? file_get_contents($file) : array();
+    if (!file_exists($file)) {
+      return NULL;
+    }
+
+    $data = file_get_contents($file);
+
+    if ($data === FALSE) {
+      throw new Exception('Could not read file: ' . $file);
+    }
+
+    return $data;
 
   }
 

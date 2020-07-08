@@ -27,17 +27,24 @@ class Connection {
     $url = $config !== null ? parse_url($config) : array();
 
     $type     = $url['scheme'] ?? null;
-    $hostname = $url['host'] ?? null;
-    $username = $url['user'] ?? null;
-    $password = $url['pass'] ?? null;
-    $name     = isset($url['path']) ? trim( explode("/", $url['path'])[1] ) : null;
-    $port     = $url['port'] ?? null;
 
     switch ($type) {
 
       case "mysql":
+
+        $hostname = $url['host'] ?? null;
+        $username = $url['user'] ?? null;
+        $password = $url['pass'] ?? null;
+        $name     = isset($url['path']) ? trim( explode("/", $url['path'])[1] ) : null;
+        $port     = $url['port'] ?? null;
+
         require_once( dirname(__FILE__) . "/MySQL/index.php" );
         return new MySQLConnection($hostname, $username, $password, $name, $port);
+
+      case "psql":
+      case "postgresql":
+        require_once( dirname(__FILE__) . "/PostgreSQL/index.php" );
+        return new PostgreSQLConnection($config, PGSQL_CONNECT_FORCE_NEW);
 
       default:
         throw new TypeError('Database type "' . $type . '" is unsupported.');
