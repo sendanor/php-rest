@@ -285,7 +285,7 @@ class Request {
 
     // Invalidate non-strings
     if ( !is_string($search) ) {
-      throw new TypeError('Match option was invalid: ' . var_export($search, true) );
+      throw new TypeError('Match option was invalid: ' . Log\stringifyValues([$search]) );
     }
 
     $search = self::_splitPath(self::normalizeMatchFormat($search));
@@ -532,7 +532,7 @@ class Request {
       } else {
 
         if (!is_callable($f)) {
-          throw new TypeError('Argument is not callable: ' . var_export($f, true) );
+          throw new TypeError('Argument is not callable: ' . Log\stringifyValues([$f]) );
         }
 
         $response = $f(...$params);

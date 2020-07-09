@@ -867,8 +867,33 @@ final class DecimalTest extends TestCase {
   public function testCanFormatDecimal () {
 
     $this->assertSame(
-      '124.56',
+      '124.57',
       Decimal::format( new Decimal('124.56789'), 2)
+    );
+
+    $this->assertSame(
+      '-124.57',
+      Decimal::format( new Decimal('-124.56789'), 2)
+    );
+
+    $this->assertSame(
+      '124.56',
+      Decimal::format( new Decimal('124.561234'), 2)
+    );
+
+    $this->assertSame(
+      '125',
+      Decimal::format( new Decimal('124.561234'), 0)
+    );
+
+    $this->assertSame(
+      '12',
+      Decimal::format( new Decimal('12.123'), 0)
+    );
+
+    $this->assertSame(
+      '13',
+      Decimal::format( new Decimal('12.9999999999999999999999'), 0)
     );
 
   }

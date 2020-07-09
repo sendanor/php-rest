@@ -387,7 +387,7 @@ class Decimal implements JsonSerializable {
    * @return Decimal
    * @throws Exception if bcmath extension is not loaded
    */
-  static public function round (Decimal $value) {
+  static private function _round (Decimal $value) {
 
     Assert::extensionLoaded("bcmath");
 
@@ -420,14 +420,32 @@ class Decimal implements JsonSerializable {
   /**
    * @param Decimal $value
    * @param int $scale
+   * @return Decimal
+   * @throws Exception if bcmath extension is not loaded
+   */
+  static public function round (Decimal $value, int $scale = 0) {
+
+    if ($scale <= 0) {
+      return self::_round($value);
+    }
+
+    $scale_value = bcpow("10", $scale);
+
+    $result = self::div(self::_round(self::mul($value, $scale_value)), $scale_value);
+
+    return new Decimal( bcadd($result, 0, $scale) );
+
+  }
+
+  /**
+   * @param Decimal $value
+   * @param int $scale
    * @return string
    * @throws Exception if bcmath extension is not loaded
    */
   static public function format (Decimal $value, int $scale) {
 
-    Assert::extensionLoaded("bcmath");
-
-    return bcadd("".$value, 0, $scale);
+    return "" . self::round($value, $scale);
 
   }
 

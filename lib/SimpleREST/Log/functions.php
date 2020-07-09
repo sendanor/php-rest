@@ -14,6 +14,7 @@ use function SimpleREST\Bootstrap\isProduction;
 
 /**
  * @param $msg string
+ * @throws Exception
  */
 function error (...$msg) {
   Manager::getLogger()->error(...$msg);
@@ -21,6 +22,7 @@ function error (...$msg) {
 
 /**
  * @param $msg string
+ * @throws Exception
  */
 function warning (...$msg) {
   Manager::getLogger()->warning(...$msg);
@@ -28,6 +30,7 @@ function warning (...$msg) {
 
 /**
  * @param $msg string
+ * @throws Exception
  */
 function info (...$msg) {
   Manager::getLogger()->info(...$msg);
@@ -35,6 +38,7 @@ function info (...$msg) {
 
 /**
  * @param $msg string
+ * @throws Exception
  */
 function debug (...$msg) {
   if (! isProduction() ) {
@@ -43,16 +47,27 @@ function debug (...$msg) {
 }
 
 /**
- * @param mixed[] $args
+ * @param array $args
  * @return string
  */
-function stringifyValues (array $args) {
-  return implode(" ", array_map(function($item) {
+function stringifyValues (...$args) {
 
-    if (is_string($item)) return $item;
+  if ( count($args) >= 2 ) {
+    return implode(" ", array_map(function($item) {
+      return stringifyValues($item);
+    }, $args));
+  }
 
-    return var_export($item, true);
-  }, $args));
+  $args = array_shift($args);
+
+  if (is_string($args)) return $args;
+
+  if (method_exists($args, '__toString')) {
+    return "" . $args;
+  }
+
+  return var_export($args, true);
+
 }
 
 /**
