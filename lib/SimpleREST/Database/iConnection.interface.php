@@ -8,22 +8,6 @@ namespace SimpleREST\Database;
 interface iConnection {
 
   /**
-   * iConnection constructor.
-   *
-   * Users should not use these constructors directly:
-   *
-   * Get a iConnection instance using `SimpleREST\Database\Connection::create($config)`
-   *
-   * @param string|null $hostname
-   * @param string|null $username
-   * @param string|null $password
-   * @param string|null $name
-   * @param int|null $port
-   * @param string|null $socket
-   */
-  public function __construct ($hostname = null, $username = null, $password = null, $name = null, $port = null, $socket = null);
-
-  /**
    * Returns TRUE if connected to the database.
    *
    * @return bool
