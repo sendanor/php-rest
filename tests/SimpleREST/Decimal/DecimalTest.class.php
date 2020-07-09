@@ -24,9 +24,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanStringifyDecimal () {
 
-    $this->assertEquals(
-      '' . new Decimal('1.23'),
-      '1.23'
+    $this->assertSame(
+      '1.23',
+      '' . new Decimal('1.23')
     );
 
   }
@@ -36,9 +36,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanSerializeJSON () {
 
-    $this->assertEquals(
-      json_encode(new Decimal('1.23')),
-      '1.23'
+    $this->assertSame(
+      '1.23',
+      json_encode(new Decimal('1.23'))
     );
 
   }
@@ -48,9 +48,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanSumDecimals () {
 
-    $this->assertEquals(
-      json_encode(Decimal::sum('0.23', '1.04')),
-      '1.27'
+    $this->assertSame(
+      '1.27',
+      rtrim('' . Decimal::sum('0.23', '1.04'), "0")
     );
 
   }
@@ -60,9 +60,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanSubstractDecimals () {
 
-    $this->assertEquals(
-      json_encode(Decimal::sub( '1.04', '0.23')),
-      '0.81'
+    $this->assertSame(
+      '0.81',
+      rtrim('' . Decimal::sub( '1.04', '0.23'), "0")
     );
 
   }
@@ -72,9 +72,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanDivideDecimals () {
 
-    $this->assertEquals(
-      json_encode(Decimal::div( '124.56', '1.24')),
-      '100.4516129032'
+    $this->assertSame(
+      '100.4516129032',
+      '' . Decimal::div( '124.56', '1.24')
     );
 
   }
@@ -84,9 +84,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanMultiplyDecimals () {
 
-    $this->assertEquals(
-      json_encode(Decimal::mul( '124.56', '10.5')),
-      '1307.88'
+    $this->assertSame(
+      '1307.88',
+      rtrim('' . Decimal::mul( '124.56', '10.5'), "0")
     );
 
   }
@@ -96,9 +96,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanCompareDecimalsPositive () {
 
-    $this->assertEquals(
-      json_encode(Decimal::compare( '124.56', '10.5')),
-      1
+    $this->assertSame(
+      1,
+      Decimal::compare( '124.56', '10.5')
     );
 
   }
@@ -108,9 +108,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanCompareDecimalsNegative () {
 
-    $this->assertEquals(
-      json_encode(Decimal::compare( '10.5', '124.56')),
-      -1
+    $this->assertSame(
+      -1,
+      Decimal::compare( '10.5', '124.56')
     );
 
   }
@@ -120,9 +120,9 @@ final class DecimalTest extends TestCase {
    */
   public function testCanCompareDecimalsEqual () {
 
-    $this->assertEquals(
-      json_encode(Decimal::compare( '124.56', '124.56')),
-      0
+    $this->assertSame(
+      0,
+      Decimal::compare( '124.56', '124.56')
     );
 
   }
@@ -132,21 +132,22 @@ final class DecimalTest extends TestCase {
    */
   public function testCanTestEquality () {
 
-    $this->assertEquals(
-      json_encode(Decimal::isEqual( '124.56', '124.56')),
-      true
+    $this->assertSame(
+      true,
+      Decimal::isEqual( '124.56', '124.56')
     );
 
   }
 
   /**
    *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function testCanFormatDecimal () {
 
-    $this->assertEquals(
-      json_encode(Decimal::format( '124.56789', 2)),
-      '124.56'
+    $this->assertSame(
+      '124.56',
+      Decimal::format( new Decimal('124.56789'), 2)
     );
 
   }

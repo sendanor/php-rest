@@ -88,12 +88,7 @@ class Decimal implements JsonSerializable {
     }
 
     return new Decimal( reduce($values, function($a, $b) {
-
-      Log::debug('A = ', $a);
-      Log::debug('B = ', $b);
-
       return bcsub("".$a, "".$b, self::INTERNAL_SCALE);
-
     } ) );
 
   }
@@ -155,7 +150,7 @@ class Decimal implements JsonSerializable {
    * @return int
    */
   static public function compare ($a, $b) {
-    return bccomp("" . $a, "" . $b, self::INTERNAL_SCALE);
+    return (int) bccomp("" . $a, "" . $b, self::INTERNAL_SCALE);
   }
 
   /**
@@ -181,12 +176,12 @@ class Decimal implements JsonSerializable {
   /**
    * @param Decimal $value
    * @param int $scale
-   * @return Decimal
+   * @return string
    * @throws Exception if bcmath extension is not loaded
    */
   static public function format (Decimal $value, int $scale) {
 
-    return new Decimal( bcadd("".$value, 0, $scale) );
+    return bcadd("".$value, 0, $scale);
 
   }
 
