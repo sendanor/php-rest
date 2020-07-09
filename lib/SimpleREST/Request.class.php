@@ -666,7 +666,7 @@ class Request {
    * @return bool
    */
   public static function isProduction () {
-    return defined('REST_PRODUCTION') && REST_PRODUCTION === true;
+    return Bootstrap\isProduction();
   }
 
   /**
@@ -674,16 +674,7 @@ class Request {
    */
   public static function getDefaultName () {
 
-    return defined('REST_NAME') ? REST_NAME : self::getDefaultLoggerName();
-
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDefaultLoggerName () {
-
-    return defined('REST_LOGGER_NAME') ? REST_LOGGER_NAME : 'unnamed';
+    return Bootstrap\getDefaultName();
 
   }
 

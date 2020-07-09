@@ -39,3 +39,28 @@ function pathStartsWith (string $path) {
   return startsWith(getPath(), $path);
 
 }
+
+/**
+ * @return bool
+ */
+function isProduction () {
+  return defined('REST_PRODUCTION') && REST_PRODUCTION === true;
+}
+
+/**
+ * @return string
+ */
+function getDefaultLoggerName () {
+
+  return defined('REST_LOGGER_NAME') ? REST_LOGGER_NAME : 'unnamed';
+
+}
+
+/**
+ * @return string
+ */
+function getDefaultName () {
+
+  return defined('REST_NAME') ? REST_NAME : getDefaultLoggerName();
+
+}

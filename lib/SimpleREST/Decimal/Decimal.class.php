@@ -3,6 +3,7 @@
 namespace SimpleREST;
 
 require_once( dirname(dirname(__FILE__)) . '/ArrayUtils/every.php');
+require_once( dirname(dirname(__FILE__)) . '/Assert.class.php');
 
 use JsonSerializable;
 use Exception;
@@ -23,8 +24,11 @@ class Decimal implements JsonSerializable {
    * Decimal constructor.
    *
    * @param mixed $value
+   * @throws Exception if extension bcmath is not enabled
    */
   public function __construct ($value) {
+
+    Assert::extensionLoaded("bcmath");
 
     $this->_value = "" . $value;
 
@@ -98,7 +102,7 @@ class Decimal implements JsonSerializable {
 
     return new Decimal( array_reduce($values, function($a, $b) {
 
-      $value = bcdiv("" . $a, "" . $b, self::INTERNAL_SCALE);
+      $value = \bcdiv("" . $a, "" . $b, self::INTERNAL_SCALE);
 
       if ($value === NULL) {
         throw new Exception('Divided by zero!');
@@ -159,6 +163,18 @@ class Decimal implements JsonSerializable {
     return SimpleREST\ArrayUtils\every($values, function($item) use ($first) {
       return self::compare($first, $item) === 0;
     } );
+
+  }
+
+  /**
+   * @param Decimal $value
+   * @param int $scale
+   * @return Decimal
+   * @throws Exception if bcmath extension is not loaded
+   */
+  static public function format (Decimal $value, int $scale) {
+
+    return new Decimal( bcadd("".$value, 0, $scale) );
 
   }
 

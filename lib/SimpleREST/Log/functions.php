@@ -7,8 +7,8 @@
 namespace SimpleREST\Log;
 
 use Exception;
-use SimpleREST\Request;
 use TypeError;
+use function SimpleREST\Bootstrap\isProduction;
 
 /**
  * @param $msg string
@@ -35,7 +35,7 @@ function info (...$msg) {
  * @param $msg string
  */
 function debug (...$msg) {
-  if (! Request::isProduction() ) {
+  if (! isProduction() ) {
     Manager::getLogger()->debug(...$msg);
   }
 }
