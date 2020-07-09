@@ -6,6 +6,8 @@
 
 namespace SimpleREST\Log;
 
+require_once( dirname(dirname(__FILE__)) . '/Bootstrap/index.php' );
+
 use Exception;
 use TypeError;
 use function SimpleREST\Bootstrap\isProduction;

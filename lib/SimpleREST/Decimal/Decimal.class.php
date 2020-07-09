@@ -2,11 +2,16 @@
 
 namespace SimpleREST;
 
+require_once( dirname(dirname(__FILE__)) . '/Log/index.php' );
 require_once( dirname(dirname(__FILE__)) . '/ArrayUtils/every.php');
+require_once( dirname(dirname(__FILE__)) . '/ArrayUtils/reduce.php');
 require_once( dirname(dirname(__FILE__)) . '/Assert.class.php');
 
+use SimpleREST\Log\Log;
 use JsonSerializable;
 use Exception;
+use function SimpleREST\ArrayUtils\every;
+use function SimpleREST\ArrayUtils\reduce;
 
 class Decimal implements JsonSerializable {
 
@@ -61,8 +66,10 @@ class Decimal implements JsonSerializable {
       throw new Exception('Must have at least one argument!');
     }
 
-    return new Decimal( array_reduce($values, function($total, $item) {
-      return bcadd($total, "" . $item, self::INTERNAL_SCALE);
+    return new Decimal( reduce($values, function($a, $b) {
+
+      return bcadd($a, "" . $b, self::INTERNAL_SCALE);
+
     } ) );
 
   }
@@ -80,8 +87,13 @@ class Decimal implements JsonSerializable {
       throw new Exception('Must have at least two arguments!');
     }
 
-    return new Decimal( array_reduce($values, function($a, $b) {
+    return new Decimal( reduce($values, function($a, $b) {
+
+      Log::debug('A = ', $a);
+      Log::debug('B = ', $b);
+
       return bcsub("".$a, "".$b, self::INTERNAL_SCALE);
+
     } ) );
 
   }
@@ -100,7 +112,7 @@ class Decimal implements JsonSerializable {
       throw new Exception('Must have at least two arguments!');
     }
 
-    return new Decimal( array_reduce($values, function($a, $b) {
+    return new Decimal( reduce($values, function($a, $b) {
 
       $value = \bcdiv("" . $a, "" . $b, self::INTERNAL_SCALE);
 
@@ -127,7 +139,7 @@ class Decimal implements JsonSerializable {
       throw new Exception('Must have at least two arguments!');
     }
 
-    return new Decimal( array_reduce($values, function($a, $b) {
+    return new Decimal( reduce($values, function($a, $b) {
 
       return bcmul("" . $a, "" . $b, self::INTERNAL_SCALE);
 
@@ -160,7 +172,7 @@ class Decimal implements JsonSerializable {
 
     if (count($values) === 0) return true;
 
-    return SimpleREST\ArrayUtils\every($values, function($item) use ($first) {
+    return every($values, function($item) use ($first) {
       return self::compare($first, $item) === 0;
     } );
 
