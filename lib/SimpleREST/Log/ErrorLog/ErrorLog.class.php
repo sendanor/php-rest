@@ -3,6 +3,7 @@
  * Sendanor's PHP REST Framework
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
+declare(strict_types=1);
 
 namespace SimpleREST\Log;
 
@@ -55,7 +56,7 @@ class ErrorLog extends BaseLogger {
    */
   protected function _write ($level, array $values) {
 
-    fwrite(self::$STDERR, '[' . $this->_name. '] [' . $level . '] ' . stringifyValues($values) . "\n" );
+    fwrite(self::$STDERR, '[' . $this->_name. '] [' . $level . '] ' . stringifyValues(...$values) . "\n" );
 
   }
 

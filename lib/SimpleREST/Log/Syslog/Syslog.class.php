@@ -3,6 +3,7 @@
  * Sendanor's PHP REST Framework
  * Copyright 2017-2020 Jaakko Heusala <jheusala@iki.fi>
  */
+declare(strict_types=1);
 
 namespace SimpleREST\Log;
 
@@ -29,7 +30,7 @@ class Syslog extends BaseLogger {
    */
   protected function _write ($level, array $values) {
 
-    syslog($level, stringifyValues($values));
+    syslog($level, stringifyValues(...$values));
 
   }
 

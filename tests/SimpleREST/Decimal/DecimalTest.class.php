@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 require_once( dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/SimpleREST/Decimal/Decimal.class.php');
 
@@ -10,7 +11,45 @@ final class DecimalTest extends TestCase {
   /**
    *
    */
-  public function testCanCreateDecimal () {
+  public function testCanCreateDecimalFromDecimal () {
+
+    $value = new Decimal('124.567');
+
+    $this->assertInstanceOf(
+      Decimal::class,
+      new Decimal($value)
+    );
+
+  }
+
+  /**
+   *
+   */
+  public function testCanCreateDecimalFromInteger () {
+
+    $this->assertInstanceOf(
+      Decimal::class,
+      new Decimal(123)
+    );
+
+  }
+
+  /**
+   *
+   */
+  public function testCanCreateDecimalFromFloat () {
+
+    $this->assertInstanceOf(
+      Decimal::class,
+      new Decimal(123.456)
+    );
+
+  }
+
+  /**
+   *
+   */
+  public function testCanCreateDecimalFromString () {
 
     $this->assertInstanceOf(
       Decimal::class,

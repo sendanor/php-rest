@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace SimpleREST;
 
@@ -33,9 +34,9 @@ class Decimal implements JsonSerializable {
    */
   public function __construct ($value) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
-    $this->_value = "" . trim($value);
+    $this->_value = trim('' . $value );
 
   }
 
@@ -154,7 +155,7 @@ class Decimal implements JsonSerializable {
    */
   static public function sum (...$values) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if (count($values) < 0) {
       throw new Exception('Must have at least one argument!');
@@ -162,7 +163,7 @@ class Decimal implements JsonSerializable {
 
     return new Decimal( reduce($values, function($a, $b) {
 
-      return bcadd($a, "" . $b, self::INTERNAL_SCALE);
+      return bcadd('' . $a, '' . $b, self::INTERNAL_SCALE);
 
     } ) );
 
@@ -178,14 +179,14 @@ class Decimal implements JsonSerializable {
    */
   static public function sub (...$values) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if (count($values) <= 1) {
       throw new Exception('Must have at least two arguments!');
     }
 
     return new Decimal( reduce($values, function($a, $b) {
-      return bcsub("".$a, "".$b, self::INTERNAL_SCALE);
+      return bcsub(''.$a, "".$b, self::INTERNAL_SCALE);
     } ) );
 
   }
@@ -201,7 +202,7 @@ class Decimal implements JsonSerializable {
    */
   static public function div (...$values) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if (count($values) <= 1) {
       throw new Exception('Must have at least two arguments!');
@@ -209,7 +210,7 @@ class Decimal implements JsonSerializable {
 
     return new Decimal( reduce($values, function($a, $b) {
 
-      $value = bcdiv("" . $a, "" . $b, self::INTERNAL_SCALE);
+      $value = bcdiv('' . $a, '' . $b, self::INTERNAL_SCALE);
 
       if ($value === NULL) {
         throw new Exception('Divided by zero!');
@@ -231,7 +232,7 @@ class Decimal implements JsonSerializable {
    */
   static public function mul (...$values) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if (count($values) <= 1) {
       throw new Exception('Must have at least two arguments!');
@@ -239,7 +240,7 @@ class Decimal implements JsonSerializable {
 
     return new Decimal( reduce($values, function($a, $b) {
 
-      return bcmul("" . $a, "" . $b, self::INTERNAL_SCALE);
+      return bcmul('' . $a, '' . $b, self::INTERNAL_SCALE);
 
     } ) );
 
@@ -255,9 +256,9 @@ class Decimal implements JsonSerializable {
    */
   static public function compare ($a, $b) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
-    return (int) bccomp("" . $a, "" . $b, self::INTERNAL_SCALE);
+    return (int) bccomp('' . $a, '' . $b, self::INTERNAL_SCALE);
 
   }
 
@@ -317,7 +318,7 @@ class Decimal implements JsonSerializable {
    */
   static public function isEqual (...$values) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if (count($values) === 0) return true;
 
@@ -338,15 +339,15 @@ class Decimal implements JsonSerializable {
    */
   static public function floor (Decimal $value) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if ($value->isInteger()) return new Decimal( self::_normalize('' . $value) );
 
     if ( $value->isNegative() ) {
-      return new Decimal( self::_normalize(bcsub($value, 1, 0)) );
+      return new Decimal( self::_normalize(bcsub(''.$value, '1', 0)) );
     }
 
-    return new Decimal( self::_normalize(bcsub($value, 0, 0)) );
+    return new Decimal( self::_normalize(bcsub(''. $value, '0', 0)) );
 
   }
 
@@ -357,15 +358,15 @@ class Decimal implements JsonSerializable {
    */
   static public function ceil (Decimal $value) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if ($value->isInteger()) return new Decimal( self::_normalize('' . $value) );
 
     if (!$value->isNegative()) {
-      return new Decimal( self::_normalize(bcadd($value, 1, 0)) );
+      return new Decimal( self::_normalize(bcadd(''.$value, '1', 0)) );
     }
 
-    return new Decimal( self::_normalize(bcsub($value, 0, 0)) );
+    return new Decimal( self::_normalize(bcsub(''.$value, '0', 0)) );
 
   }
 
@@ -389,7 +390,7 @@ class Decimal implements JsonSerializable {
    */
   static private function _round (Decimal $value) {
 
-    Assert::extensionLoaded("bcmath");
+    Assert::extensionLoaded('bcmath');
 
     if ($value->isInteger()) return new Decimal( self::_normalize('' . $value) );
 
@@ -429,11 +430,11 @@ class Decimal implements JsonSerializable {
       return self::_round($value);
     }
 
-    $scale_value = bcpow("10", $scale);
+    $scale_value = bcpow("10", "".$scale);
 
     $result = self::div(self::_round(self::mul($value, $scale_value)), $scale_value);
 
-    return new Decimal( bcadd($result, 0, $scale) );
+    return new Decimal( bcadd(''.$result, '0', $scale) );
 
   }
 

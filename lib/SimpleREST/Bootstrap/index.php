@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace SimpleREST\Bootstrap;
 
@@ -22,6 +23,8 @@ function getPath () {
 }
 
 /**
+ * Returns TRUE if $str starts with $value.
+ *
  * @param string $str
  * @param string $value
  * @return bool

@@ -2,6 +2,8 @@
 /*
  * Copyright 2020 Sendanor <info@sendanor.fi>
  */
+declare(strict_types=1);
+
 namespace SimpleREST\Mail;
 
 require_once( dirname(dirname(dirname(__FILE__))) . '/File/index.php' );
