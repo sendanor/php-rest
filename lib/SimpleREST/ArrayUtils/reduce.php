@@ -6,9 +6,9 @@ namespace SimpleREST\ArrayUtils;
  * Unlike PHP reduce, this will not call callback for the first NULL value.
  *
  * @param array $values
- * @param callable $fn
+ * @param callable $callback
  * @param mixed $initial
- * @return bool
+ * @return array
  */
 function reduce (array $values, callable $callback, $initial = NULL) {
 
