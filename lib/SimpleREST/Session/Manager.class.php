@@ -3,31 +3,47 @@ declare(strict_types=1);
 
 namespace SimpleREST\Session;
 
-use SimpleREST\Request;
-use SimpleREST\Response;
-use SimpleREST\Random;
+require_once(dirname(__FILE__).'/iManager.interface.php');
+require_once(dirname(__FILE__).'/iStore.interface.php');
+require_once(dirname(__FILE__).'/iKeyGenerator.interface.php');
+
 use Exception;
 
-if (!defined('REST_SESSION_HEADER')) {
-  define('REST_SESSION_HEADER', 'SessionId');
-}
-
-class Manager {
+class Manager implements iManager {
 
   /**
-   * @var iManager
+   * @var iStore
    */
-  private static $_manager = null;
+  private $_store;
 
   /**
-   * Create a new (random) session key.
+   * @var iKeyGenerator
+   */
+  private $_keyGenerator;
+
+  /**
+   * @var iKeyMediator
+   */
+  private $_keyMediator;
+
+  /**
+   * Manager constructor.
    *
-   * @return string
-   * @throws Exception if an appropriate source of randomness cannot be found
+   * @param iStore $store
+   * @param iKeyGenerator $keyGenerator
+   * @param iKeyMediator $keyMediator
    */
-  public static function createSessionKey () {
+  public function __construct (
+    iStore $store,
+    iKeyGenerator $keyGenerator,
+    iKeyMediator $keyMediator
+  ) {
 
-    return Random::string(32);
+    $this->_store = $store;
+
+    $this->_keyGenerator = $keyGenerator;
+
+    $this->_keyMediator = $keyMediator;
 
   }
 
@@ -35,15 +51,13 @@ class Manager {
    * @return Session
    * @throws Exception if session must be created but an appropriate source of randomness cannot be found
    */
-  public static function createSession () {
+  public function createSession () : Session {
 
-    self::initManager();
+    $sessionKey = $this->_keyGenerator->createSessionKey();
 
-    $sessionKey = self::createSessionKey();
+    $session = $this->_store->createSession($sessionKey);
 
-    $session = self::$_manager->createSession($sessionKey);
-
-    Response::setHeader(REST_SESSION_HEADER, $sessionKey);
+    $this->_keyMediator->setKey($sessionKey);
 
     return $session;
 
@@ -53,32 +67,21 @@ class Manager {
    * @return Session
    * @throws Exception if session header could not be found
    */
-  public static function getSession () {
+  public function getSession () : Session {
 
-    self::initManager();
-
-    $sessionKey = Request::getHeader(REST_SESSION_HEADER);
-
-    if ($sessionKey === null) {
-      throw new Exception('Could not find a session header');
-    }
-
-    return self::$_manager->getSession($sessionKey);
+    return $this->_store->getSession( $this->_keyMediator->getKey() );
 
   }
 
   /**
-   * Initializes default session manager
+   * @return bool
+   * @throws Exception
    */
-  public static function initManager () {
+  public function hasSession () : bool {
 
-    if ( self::$_manager === null ) {
+    if ( !$this->_keyMediator->hasKey() ) return false;
 
-      require_once(dirname(__FILE__).'/Database/index.php');
-
-      self::$_manager = new Database\Manager();
-
-    }
+    return $this->_store->hasSession( $this->_keyMediator->getKey() );
 
   }
 

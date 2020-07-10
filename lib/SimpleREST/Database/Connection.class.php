@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace SimpleREST\Database;
 
+require_once( dirname(__FILE__) . '/iConnection.interface.php');
+
 use Exception;
 use TypeError;
 
 /**
- * Interface iDatabaseConnection
+ * Static Connection class
  */
 class Connection {
 

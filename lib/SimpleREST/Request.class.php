@@ -11,6 +11,8 @@ require_once( dirname(__FILE__) . '/Log/index.php' );
 require_once( dirname(__FILE__) . '/HTTPError.class.php' );
 require_once( dirname(__FILE__) . '/HTTPStatusMessages.class.php' );
 require_once( dirname(__FILE__) . '/Bootstrap/index.php' );
+require_once( dirname(__FILE__) . '/Session/iManager.interface.php' );
+require_once( dirname(__FILE__) . '/Session/Session.class.php' );
 
 use Exception;
 use TypeError;
@@ -74,6 +76,11 @@ class Request {
   private static $_oldErrorHandler = null;
 
   /**
+   * @var Session\iManager
+   */
+  private static $_sessionManager = null;
+
+  /**
    * Returns current method name, all lowercase characters.
    *
    * Defaults to "get".
@@ -98,7 +105,7 @@ class Request {
 	public static function isMethodGet() {
 		return self::getMethod() === 'get';
 	}
-	
+
   /**
    * Returns current request path.
    *
@@ -106,6 +113,7 @@ class Request {
    *
    * @return string
    * @throws HTTPError 404 if request is not under configured REST_PATH
+   * @throws Exception
    */
 	public static function getPath () {
 
@@ -270,6 +278,7 @@ class Request {
    * @param string|array $search Method name as string, or "*" for any, or an array of method names. Must be lowercase.
    * @return bool|array
    * @fixme Implement unit testing
+   * @throws HTTPError
    */
 	public static function isMatch ( $search ) {
 
@@ -394,6 +403,7 @@ class Request {
    * @param string|array|null $search The match option
    * @param callable $f Calls the function with optional parameters from the matched path.
    * @throws TypeError if match option is invalid
+   * @throws Exception
    */
 	public static function match ( $search, $f ) {
 
@@ -415,6 +425,7 @@ class Request {
    * @param string $className
    * @param array $params
    * @throws ReflectionException if the class does not exist
+   * @throws Exception
    */
   public static function matchUsingReflectionClass ($className, $params) {
 
@@ -509,6 +520,7 @@ class Request {
    *
    * @param callable|string $f The function to call or a class name
    * @param mixed[] $params Optional params to the $f
+   * @throws Exception
    */
 	public static function run ($f, ...$params) {
 
@@ -556,6 +568,7 @@ class Request {
 
   /**
    * @param mixed $e
+   * @throws Exception
    */
   protected static function _handleError ($e) {
 
@@ -622,6 +635,7 @@ class Request {
    * @param string $errorFile
    * @param int $errorLine
    * @param array $errorContext
+   * @throws Exception
    */
   protected static function _onError ($errno, $errorMessage, $errorFile, $errorLine, $errorContext) {
 
@@ -632,6 +646,7 @@ class Request {
   /**
    * @param string $output
    * @return string
+   * @throws Exception
    */
   protected static function _onOutput ($output) {
 
@@ -684,6 +699,7 @@ class Request {
    *
    * See `Request::enableShutdownHandler()`
    *
+   * @throws Exception
    */
   public static function onShutdown () {
 
@@ -740,6 +756,55 @@ class Request {
     } else {
       Log\debug('No errors detected.');
     }
+
+  }
+
+  /**
+   * @return bool
+   */
+  public static function isSecureConnection () : bool {
+    return !!$_SERVER['HTTPS'];
+  }
+
+  /**
+   *
+   */
+  public static function initSessionManager () {
+
+    if (self::$_sessionManager === null) {
+
+      require_once( dirname(__FILE__) . '/Session/Database/index.php' );
+      require_once( dirname(__FILE__) . '/Session/RandomKeyGenerator.class.php' );
+      require_once( dirname(__FILE__) . '/Session/CookieKeyMediator.class.php' );
+      require_once( dirname(__FILE__) . '/Session/Manager.class.php' );
+
+      self::$_sessionManager = new Session\Manager(
+        new Session\DatabaseStore(),
+        new Session\RandomKeyGenerator(32),
+        new Session\CookieKeyMediator('NOR_SSID', 0, '/', '', self::isSecureConnection(), TRUE)
+      );
+
+    }
+
+  }
+
+  /**
+   * @return Session\Session
+   * @throws Exception
+   */
+  public static function getSession () : Session\Session {
+
+    if (self::$_sessionManager === null) {
+      self::initSessionManager();
+    }
+
+    if (self::$_sessionManager->hasSession()) {
+      Log\debug('Fetching session...');
+      return self::$_sessionManager->getSession();
+    }
+
+    Log\debug('Creating new session...');
+    return self::$_sessionManager->createSession();
 
   }
 

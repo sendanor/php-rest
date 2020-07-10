@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace SimpleREST\Database;
 
+require_once( dirname(dirname(__FILE__)) . '/iConnection.interface.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/Log/index.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/Assert.class.php');
+
 use mysqli;
 use Exception;
 use SimpleREST\Log\Log;
@@ -54,6 +58,13 @@ class MySQLConnection implements iConnection {
     Log::debug('Connecting with', $hostname, $username, $password, $name, $port, $socket);
 
     Assert::extensionLoaded("mysqli");
+
+    $hostname = $hostname ?? ini_get("mysqli.default_host");
+    $username = $username ?? ini_get("mysqli.default_user");
+    $password = $password ?? ini_get("mysqli.default_pw");
+    $name     = $name     ?? '';
+    $port     = (int) ($port     ?? ini_get("mysqli.default_port"));
+    $socket   = $socket   ?? ini_get("mysqli.default_socket");
 
     $db = new mysqli($hostname, $username, $password, $name, $port, $socket);
 

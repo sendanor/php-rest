@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace SimpleREST\Database;
 
+require_once( dirname(dirname(__FILE__)) . '/iQuery.interface.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/Log/index.php');
+
 use mysqli;
 use mysqli_stmt;
 use Exception;

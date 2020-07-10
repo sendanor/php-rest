@@ -15,6 +15,10 @@ if(!defined('REST_PATH')) {
 	define('REST_PATH', '');
 }
 
+if (!defined('REST_SESSION_HEADER')) {
+  define('REST_SESSION_HEADER', 'SessionId');
+}
+
 require_once( dirname(__FILE__) . '/Assert.class.php' );
 require_once( dirname(__FILE__) . '/Random.class.php' );
 require_once( dirname(__FILE__) . '/JSON.class.php' );

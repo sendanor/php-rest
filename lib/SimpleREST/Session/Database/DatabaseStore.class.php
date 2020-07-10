@@ -1,15 +1,16 @@
 <?php
 declare(strict_types=1);
 
-/** @noinspection SqlNoDataSourceInspection */
-/** @noinspection SqlDialectInspection */
+namespace SimpleREST\Session;
 
-namespace SimpleREST\Session\Database;
+require_once( dirname(dirname(dirname(__FILE__))) . '/Database/Connection.class.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/JSON.class.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/Log/index.php');
+
+require_once( dirname(dirname(__FILE__)) . '/iStore.interface.php');
 
 use SimpleREST\Database\Connection;
 use SimpleREST\Database\iConnection;
-use SimpleREST\Session\iManager;
-use SimpleREST\Session\Session;
 use SimpleREST\Log\Log;
 use SimpleREST\JSON;
 use Exception;
@@ -17,6 +18,10 @@ use TypeError;
 
 if (!defined('FETCH_SESSION_SQL')) {
   define('FETCH_SESSION_SQL', 'SELECT * FROM `session` WHERE session_key = ? LIMIT 1');
+}
+
+if (!defined('CHECK_SESSION_SQL')) {
+  define('CHECK_SESSION_SQL', 'SELECT COUNT(*) AS count FROM `session` WHERE session_key = ? LIMIT 1');
 }
 
 if (!defined('DELETE_SESSION_SQL')) {
@@ -36,7 +41,7 @@ if (!defined('SAVE_SESSION_SQL')) {
  *
  * @package SimpleREST\Session\Database
  */
-class Manager implements iManager {
+class DatabaseStore implements iStore {
 
   /**
    * @var iConnection
@@ -105,7 +110,7 @@ class Manager implements iManager {
    * @throws Exception if session could not be found
    * @throws Exception if database errors
    */
-  public function getSession ( string $key ) {
+  public function getSession ( string $key ) : Session {
 
     $rows = $this->_db->query(FETCH_SESSION_SQL, array($key));
 
@@ -138,7 +143,7 @@ class Manager implements iManager {
    * @return Session
    * @throws Exception if database errors
    */
-  public function createSession ( string $key ) {
+  public function createSession ( string $key ) : Session {
 
     $session = new Session($key, null, false );
 
@@ -162,6 +167,26 @@ class Manager implements iManager {
       $this->_db->query(SAVE_SESSION_SQL, array(JSON::encode($session), $key));
 
     }
+
+  }
+
+  /**
+   * @param string $key
+   * @return bool
+   * @throws Exception
+   */
+  public function hasSession ( string $key ) : bool {
+
+    $rows = $this->_db->query(CHECK_SESSION_SQL, array($key));
+
+    if ( count($rows) === 0 ) return false;
+
+    $row = array_shift($rows);
+
+    if (!$row) return false;
+    if (!isset($row['count'])) return false;
+
+    return $row['count'] === '1';
 
   }
 

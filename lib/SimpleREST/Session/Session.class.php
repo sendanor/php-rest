@@ -10,7 +10,8 @@ use SimpleREST\JSON;
 use stdClass;
 
 /**
- * Class BaseSession
+ * Class Session
+ *
  * @package SimpleREST\Database
  */
 class Session implements JsonSerializable, Serializable {

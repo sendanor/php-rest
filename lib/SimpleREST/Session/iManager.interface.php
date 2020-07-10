@@ -1,24 +1,32 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SimpleREST\Session;
 
+require_once( dirname(__FILE__) . '/Session.class.php');
+
 interface iManager {
 
   /**
-   * Fetch a session by key
+   * Fetch a session
    *
-   * @param string $key
    * @return Session
    */
-  public function getSession (string $key);
+  public function getSession () : Session;
 
   /**
-   * Create a new session by key
+   * Check if we have a session
    *
-   * @param string $key
+   * @return bool
+   */
+  public function hasSession () : bool;
+
+  /**
+   * Create a new session
+   *
    * @return Session
    */
-  public function createSession (string $key);
+  public function createSession () : Session;
 
 }
