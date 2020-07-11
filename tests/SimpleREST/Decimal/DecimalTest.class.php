@@ -953,4 +953,114 @@ final class DecimalTest extends TestCase {
 
   }
 
+  /**
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function testCanSerializeDecimal () {
+
+    $this->_testSerialize('124.56789');
+    $this->_testSerialize('124.5678');
+    $this->_testSerialize('14.123');
+    $this->_testSerialize('14');
+    $this->_testSerialize('-14');
+    $this->_testSerialize('-1.23');
+    $this->_testSerialize('0');
+    $this->_testSerialize('0.00');
+    $this->_testSerialize('0.123');
+    $this->_testSerialize('0.100');
+
+  }
+
+  /**
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function testCanUnserializeDecimal () {
+
+    $this->_testUnserialize('124.56789');
+    $this->_testUnserialize('124.5678');
+    $this->_testUnserialize('14.123');
+    $this->_testUnserialize('14');
+    $this->_testUnserialize('-14');
+    $this->_testUnserialize('-1.23');
+    $this->_testUnserialize('0');
+    $this->_testUnserialize('0.00');
+    $this->_testUnserialize('0.123');
+    $this->_testUnserialize('0.100');
+
+  }
+
+  /**
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function testCanReSerializeDecimal () {
+
+    $this->_testReSerialize('124.56789');
+    $this->_testReSerialize('124.5678');
+    $this->_testReSerialize('14.123');
+    $this->_testReSerialize('14');
+    $this->_testReSerialize('-14');
+    $this->_testReSerialize('-1.23');
+    $this->_testReSerialize('0');
+    $this->_testReSerialize('0.00');
+    $this->_testReSerialize('0.123');
+    $this->_testReSerialize('0.100');
+
+  }
+
+  /**
+   * @param $testValue
+   * @throws Exception
+   */
+  private function _testSerialize (string $testValue) {
+
+    $this->assertSame(
+      'O:18:"SimpleREST\Decimal":1:{s:26:" SimpleREST\Decimal _value";s:' . strlen($testValue) . ':"' . $testValue . '";}',
+      serialize(new Decimal($testValue))
+    );
+
+  }
+
+  /**
+   * @param string $testValue
+   * @throws Exception
+   */
+  private function _testUnserialize (string $testValue) {
+
+    $item = unserialize( serialize(new Decimal($testValue)) );
+
+    $this->assertInstanceOf(
+      Decimal::class,
+      $item
+    );
+
+    $this->assertSame(
+      $testValue,
+      ''.$item
+    );
+
+  }
+
+  /**
+   * @param $testValue
+   * @throws Exception
+   */
+  private function _testReSerialize (string $testValue) {
+
+    $item = unserialize( 'O:18:"SimpleREST\Decimal":1:{s:26:" SimpleREST\Decimal _value";s:'.strlen($testValue).':"'.$testValue.'";}');
+
+    $this->assertInstanceOf(
+      Decimal::class,
+      $item
+    );
+
+    $this->assertSame(
+      $testValue,
+      ''.$item
+    );
+
+  }
+
 }
