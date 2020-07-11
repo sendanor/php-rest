@@ -102,8 +102,17 @@ class Request {
    *
    * @return bool
    */
-	public static function isMethodGet() {
+	public static function isMethodGet() : bool {
 		return self::getMethod() === 'get';
+	}
+
+  /**
+   * Returns true if method is post.
+   *
+   * @return bool
+   */
+	public static function isMethodPost () : bool {
+		return self::getMethod() === 'post';
 	}
 
   /**
@@ -785,6 +794,24 @@ class Request {
       );
 
     }
+
+  }
+
+  /**
+   * @return bool
+   */
+  public static function hasSession () : bool {
+
+    if (self::$_sessionManager === null) {
+      self::initSessionManager();
+    }
+
+    if (self::$_sessionManager->hasSession()) {
+      return true;
+    }
+
+    return false;
+
 
   }
 

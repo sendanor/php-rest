@@ -10,6 +10,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCreateDecimalFromDecimal () {
 
@@ -24,6 +25,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCreateDecimalFromInteger () {
 
@@ -36,6 +38,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCreateDecimalFromFloat () {
 
@@ -214,6 +217,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanSumDecimals () {
 
@@ -226,6 +230,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanSubstractDecimals () {
 
@@ -238,6 +243,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanDivideDecimals () {
 
@@ -250,6 +256,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanMultiplyDecimals () {
 
@@ -262,6 +269,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCompareDecimalsPositive () {
 
@@ -274,6 +282,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCompareDecimalsNegative () {
 
@@ -286,6 +295,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanCompareDecimalsEqual () {
 
@@ -298,6 +308,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanTestGreaterThan () {
 
@@ -344,8 +355,10 @@ final class DecimalTest extends TestCase {
     );
 
   }
+
   /**
    *
+   * @throws Exception
    */
   public function testCanTestGreaterOrEqual () {
 
@@ -413,6 +426,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanTestLowerThan () {
 
@@ -476,6 +490,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanTestLowerOrEqual () {
 
@@ -539,6 +554,7 @@ final class DecimalTest extends TestCase {
 
   /**
    *
+   * @throws Exception
    */
   public function testCanTestEquality () {
 

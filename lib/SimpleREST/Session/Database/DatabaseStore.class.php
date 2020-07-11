@@ -186,7 +186,7 @@ class DatabaseStore implements iStore {
     if (!$row) return false;
     if (!isset($row['count'])) return false;
 
-    return $row['count'] === '1';
+    return $row['count'] === 1;
 
   }
 

@@ -1,2 +1,4 @@
 .idea
 /examples/v1/config.php
+.phpunit.result.cache
+/phpunit.phar

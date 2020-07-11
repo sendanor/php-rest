@@ -27,6 +27,20 @@ class Manager implements iManager {
   private $_keyMediator;
 
   /**
+   * Cached session key.
+   *
+   * @var string
+   */
+  private $_sessionKey;
+
+  /**
+   * Cached session object.
+   *
+   * @var Session
+   */
+  private $_session;
+
+  /**
    * Manager constructor.
    *
    * @param iStore $store
@@ -45,6 +59,9 @@ class Manager implements iManager {
 
     $this->_keyMediator = $keyMediator;
 
+    $this->_session = null;
+    $this->_sessionKey = null;
+
   }
 
   /**
@@ -59,6 +76,9 @@ class Manager implements iManager {
 
     $this->_keyMediator->setKey($sessionKey);
 
+    $this->_session = $session;
+    $this->_sessionKey = $sessionKey;
+
     return $session;
 
   }
@@ -69,19 +89,35 @@ class Manager implements iManager {
    */
   public function getSession () : Session {
 
-    return $this->_store->getSession( $this->_keyMediator->getKey() );
+    $key = $this->_keyMediator->getKey();
+
+    if ($this->_sessionKey === $key) {
+      return $this->_session;
+    }
+
+    $session = $this->_store->getSession( $key );
+
+    $this->_session = $session;
+    $this->_sessionKey = $key;
+
+    return $session;
 
   }
 
   /**
    * @return bool
    * @throws Exception
+   * @fixme This could actually fetch the session and cache the object
    */
   public function hasSession () : bool {
 
     if ( !$this->_keyMediator->hasKey() ) return false;
 
-    return $this->_store->hasSession( $this->_keyMediator->getKey() );
+    $key = $this->_keyMediator->getKey();
+
+    if ($this->_sessionKey === $key) return true;
+
+    return $this->_store->hasSession( $key );
 
   }
 
