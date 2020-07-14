@@ -39,12 +39,19 @@ row in a database table.
 
 ### Requirements
 
-* PHP 7.2 or newer
+PHP 7.3 or newer required.
 
-Optional features:
+Some required extensions:
 
-* ***Web server software:*** *Apache*, *Nginx*, etc
-* ***Database Server:*** *MySQL* Server 5.0. or newer
+ * json (for JSON support)
+ * bcmath (for Decimal support)
+ * mysqli (for MySQL support)
+ * pgsql (for PostgreSQL support)
+
+Other optional :
+
+ * ***Web server software:*** *Apache*, *Nginx*, etc
+ * ***Database Server:*** *MySQL* Server 5.0. or newer
 
 ---------------------------------------------------------------------------------------
 
