@@ -772,7 +772,7 @@ class Request {
    * @return bool
    */
   public static function isSecureConnection () : bool {
-    return !!$_SERVER['HTTPS'];
+    return !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] );
   }
 
   /**
