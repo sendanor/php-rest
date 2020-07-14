@@ -127,8 +127,16 @@ class Decimal implements JsonSerializable {
    */
   private static function _normalize (string $value) {
 
-    return self::_removeLeadingZerosAfterDecimalPoint($value);
+    return self::_removeLeadingZerosAfterDecimalPoint(trim(''. $value));
 
+  }
+
+  /**
+   * @return Decimal
+   * @throws Exception
+   */
+  public function getNormalized () {
+    return new self( self::_normalize( $this->_value ));
   }
 
   /**

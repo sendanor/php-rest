@@ -221,10 +221,24 @@ final class DecimalTest extends TestCase {
    */
   public function testCanSumDecimals () {
 
-    $this->assertSame(
-      '1.27',
-      rtrim('' . Decimal::sum('0.23', '1.04'), "0")
-    );
+    $this->assertSame('1.27', rtrim('' . Decimal::sum('0.23', '1.04'), "0"));
+
+  }
+
+  /**
+   *
+   * @throws Exception
+   */
+  public function testCanNormalize () {
+
+    $this->assertSame('1.27', ''. (new Decimal('1.2700'))->getNormalized() );
+    $this->assertSame('1.27', ''. (new Decimal('1.27'))->getNormalized() );
+    $this->assertSame('1', ''. (new Decimal('1.0000000'))->getNormalized() );
+    $this->assertSame('23.00000000001', ''. (new Decimal('23.00000000001'))->getNormalized() );
+    $this->assertSame('23.00000000001', ''. (new Decimal('23.00000000001   '))->getNormalized() );
+    $this->assertSame('23.00000000001', ''. (new Decimal('   23.00000000001   '))->getNormalized() );
+    $this->assertSame('23', ''. (new Decimal('   23.0000000000   '))->getNormalized() );
+    $this->assertSame('1230', ''. (new Decimal('1230.0000000'))->getNormalized() );
 
   }
 
