@@ -529,7 +529,6 @@ class Request {
    *
    * @param callable|string $f The function to call or a class name
    * @param mixed[] $params Optional params to the $f
-   * @throws Exception
    */
 	public static function run ($f, ...$params) {
 
@@ -577,19 +576,30 @@ class Request {
 
   /**
    * @param mixed $e
-   * @throws Exception
    */
   protected static function _handleError ($e) {
 
-    Log\error('Error: ' . $e);
+    try {
+      Log\error('Error: ' . $e);
+    } catch (Exception $e2) {
+      // FIXME: Do something...
+    }
 
     if (!Response::isSent()) {
       try {
         Response::outputException($e);
       } catch (Exception $e2) {
-        Log\error('Exception while printing previous exception: ' . $e2);
+        try {
+          Log\error('Exception while printing previous exception: ' . $e2);
+        } catch (Exception $e2) {
+          // FIXME: Do something...
+        }
       } catch (Throwable $e2) {
-        Log\error('Error while printing previous exception: ' . $e2);
+        try {
+          Log\error('Error while printing previous exception: ' . $e2);
+        } catch (Exception $e2) {
+          // FIXME: Do something...
+        }
       }
     }
 
