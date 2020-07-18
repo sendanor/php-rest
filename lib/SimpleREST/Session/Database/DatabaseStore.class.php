@@ -6,6 +6,7 @@ namespace SimpleREST\Session;
 require_once( dirname(dirname(dirname(__FILE__))) . '/Database/Connection.class.php');
 require_once( dirname(dirname(dirname(__FILE__))) . '/JSON.class.php');
 require_once( dirname(dirname(dirname(__FILE__))) . '/Log/index.php');
+require_once( dirname(dirname(dirname(__FILE__))) . '/Assert.class.php');
 
 require_once( dirname(dirname(__FILE__)) . '/iStore.interface.php');
 
@@ -13,6 +14,7 @@ use SimpleREST\Database\Connection;
 use SimpleREST\Database\iConnection;
 use SimpleREST\Log\Log;
 use SimpleREST\JSON;
+use SimpleREST\Assert;
 use Exception;
 use TypeError;
 
@@ -164,7 +166,12 @@ class DatabaseStore implements iStore {
 
     if ($session->isChanged()) {
 
-      $this->_db->query(SAVE_SESSION_SQL, array(JSON::encode($session), $key));
+      $data = JSON::encode($session);
+
+      Assert::string($data);
+      Assert::string($key);
+
+      $this->_db->query(SAVE_SESSION_SQL, array($data, $key));
 
     }
 

@@ -51,6 +51,8 @@ class MySQLQuery implements iQuery {
   public function __construct ( string $query, $mysqli ) {
 
     Log::debug('QUERY = ', $query);
+    
+    if (!$mysqli) throw new TypeError('mysqli was invalid: ' . $mysqli);
 
     $st = $mysqli->prepare($query);
 
