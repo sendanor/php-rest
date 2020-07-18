@@ -64,11 +64,20 @@ function stringifyValues (...$args) {
   if (is_string($args)) return $args;
 
   if (method_exists($args, '__toString')) {
-    return "" . $args;
+    return stripTooLong("" . $args);
   }
 
-  return var_export($args, true);
+  return stripTooLong(var_export($args, true));
 
+}
+
+function stripTooLong (string $value) : string {
+
+  if (strlen($value) >= 500) {
+    $value = substr($value, 0, 500) . '...';
+  }
+
+  return $value;
 }
 
 /**
